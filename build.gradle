@@ -20,7 +20,7 @@ dependencies {
     compile fileTree(dir: 'libraries', include: '*.jar')
     compile 'me.lucko.luckperms:luckperms-api:4.4'
     compile 'net.luckperms:api:5.1'
-    compile 'org.spongepowered:spongeapi:7.1.0-SNAPSHOT'
+    compile 'org.spongepowered:spongeapi:5.1.0-SNAPSHOT'
     compile 'br.net.fabiozumbi12.UltimateChat:UltimateChat-Sponge-7:1.9.1'
     implementation 'com.github.NucleusPowered:Nucleus:1.11.0'
     compile 'com.github.Dirt-Craft:Sponge-Discord-Lib:-SNAPSHOT'
