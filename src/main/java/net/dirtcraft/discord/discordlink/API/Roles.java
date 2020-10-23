@@ -1,7 +1,6 @@
 package net.dirtcraft.discord.discordlink.API;
 
 import net.dv8tion.jda.core.entities.Role;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import javax.annotation.Nullable;
 
@@ -23,7 +22,7 @@ public enum Roles {
     private final char color;
     private final boolean isStaff;
 
-    Roles(String id, boolean isStaff, char color, @NonNull String name){
+    Roles(String id, boolean isStaff, char color, String name){
         this.id = id == null ? null : GameChat.getGuild().getRoleById(id);
         this.name = name;
         this.color = color;
@@ -34,7 +33,7 @@ public enum Roles {
         return id;
     }
 
-    @NonNull public String getName(){
+    public String getName(){
         return name;
     }
 
@@ -42,11 +41,11 @@ public enum Roles {
         return isStaff;
     }
 
-    @NonNull public String getStyle(){
+    public String getStyle(){
         return this.isStaff ? "§" + color + "§l" : "§7";
     }
 
-    @NonNull public String getChevron(){
+    public String getChevron(){
         return (color == '7' ? "§9" : "§" + color) + "§l»";
     }
 

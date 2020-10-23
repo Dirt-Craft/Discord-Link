@@ -10,21 +10,18 @@ repositories {
     jcenter()
     mavenCentral()
     maven { url = "https://raw.github.com/FabioZumbi12/UltimateChat/mvn-repo/" }
-    maven {
-        url 'https://jitpack.io'
-        //credentials { username authToken }
-    }
+    maven { url = "http://repo.drnaylor.co.uk/artifactory/list/minecraft" }
+    maven { url = 'https://jitpack.io' }
 }
 
 dependencies {
     compile fileTree(dir: 'libraries', include: '*.jar')
-    compile 'me.lucko.luckperms:luckperms-api:4.4'
-    compile 'net.luckperms:api:5.1'
-    compile 'org.spongepowered:spongeapi:5.1.0-SNAPSHOT'
-    compile 'br.net.fabiozumbi12.UltimateChat:UltimateChat-Sponge-7:1.9.1'
-    implementation 'com.github.NucleusPowered:Nucleus:1.11.0'
-    compile 'com.github.Dirt-Craft:Sponge-Discord-Lib:-SNAPSHOT'
-    compile 'com.github.Dirt-Craft:Dirt-Database-Lib:-SNAPSHOT'
+    compile 'me.lucko.luckperms:luckperms-api:4.3'
+    compile 'org.spongepowered:spongeapi:5.2.0-SNAPSHOT'
+    compile 'br.net.fabiozumbi12.UltimateChat:UltimateChat-Sponge-56:1.9.1'
+    compile 'io.github.nucleuspowered:nucleus-api:1.1.10-LTS-COMMUNITY-S5.1'
+    compile 'com.github.Dirt-Craft:Sponge-Discord-Lib:API-5-SNAPSHOT'
+    compile 'com.github.Dirt-Craft:Dirt-Database-Lib:API-5-SNAPSHOT'
 }
 
 sponge.plugin.id = pluginId

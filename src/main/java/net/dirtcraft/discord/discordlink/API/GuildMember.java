@@ -4,7 +4,6 @@ import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.Role;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -106,7 +105,7 @@ public class GuildMember extends WrappedMember {
         return highestRank.getStyle();
     }
 
-    @NonNull public Roles getHighestRank(){
+    public Roles getHighestRank(){
         return highestRank;
     }
 }

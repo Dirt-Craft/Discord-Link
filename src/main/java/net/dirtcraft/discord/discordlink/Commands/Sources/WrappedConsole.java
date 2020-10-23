@@ -5,9 +5,9 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
-import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.util.Tristate;
@@ -43,16 +43,6 @@ public abstract class WrappedConsole implements ConsoleSource, SecuredSource, Sc
     @Override
     public String getName() {
         return this.actualSource.getName();
-    }
-
-    @Override
-    public boolean isSubjectDataPersisted() {
-        return this.actualSource.isSubjectDataPersisted();
-    }
-
-    @Override
-    public SubjectReference asSubjectReference() {
-        return this.actualSource.asSubjectReference();
     }
 
     @Override
@@ -101,23 +91,13 @@ public abstract class WrappedConsole implements ConsoleSource, SecuredSource, Sc
     }
 
     @Override
-    public boolean isChildOf(SubjectReference parent) {
-        return this.actualSource.isChildOf(parent);
+    public boolean isChildOf(Set<Context> contexts, Subject parent) {
+        return actualSource.isChildOf(contexts, parent);
     }
 
     @Override
-    public boolean isChildOf(Set<Context> contexts, SubjectReference parent) {
-        return this.actualSource.isChildOf(contexts, parent);
-    }
-
-    @Override
-    public List<SubjectReference> getParents() {
-        return this.actualSource.getParents();
-    }
-
-    @Override
-    public List<SubjectReference> getParents(Set<Context> contexts) {
-        return this.actualSource.getParents(contexts);
+    public List<Subject> getParents(Set<Context> contexts) {
+        return actualSource.getParents(contexts);
     }
 
     @Override
@@ -134,5 +114,4 @@ public abstract class WrappedConsole implements ConsoleSource, SecuredSource, Sc
     public Set<Context> getActiveContexts() {
         return this.actualSource.getActiveContexts();
     }
-
 }
