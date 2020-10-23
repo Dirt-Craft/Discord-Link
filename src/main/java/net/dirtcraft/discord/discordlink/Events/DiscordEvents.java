@@ -9,6 +9,7 @@ import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.scheduler.Task;
@@ -40,19 +41,19 @@ public class DiscordEvents extends ListenerAdapter {
         if (hasAttachment(event)) return;
 
         final MessageSource sender = new MessageSource(event);
-
+        final boolean started = Sponge.getGame().getState() == GameState.SERVER_STARTED;
         final String message = event.getMessage().getContentDisplay();
         final String rawMessage = event.getMessage().getContentRaw();
         final ActionType action = ActionType.fromMessageRaw(rawMessage);
 
-        if (action == ActionType.CHAT){
+        if (action == ActionType.CHAT && started){
             Task.builder()
                     .async()
                     .execute(() -> discordToMc(sender, message))
                     .submit(DiscordLink.getInstance());
         } else if (action == ActionType.DISCORD) {
             commandManager.process(sender, action.getCommand(event), event);
-        } else if (!action.proxy) {
+        } else if (!action.proxy && started) {
             toConsole(event, sender, action);
         }
     }

@@ -15,7 +15,7 @@ public class GamechatSender extends WrappedConsole implements ScheduledSender {
 
     @Override
     public void sendDiscordResponse(String message) {
-        if (message.length() > 1800) return;
+        if (message.length() > getCharLimit()) return;
         GameChat.sendMessage(
                 Utility.embedBuilder().addField("__Command__ \"**/" + command.toLowerCase() + "**\" __Sent__", message, false)
                         .setFooter("Sent By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl())

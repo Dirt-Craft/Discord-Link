@@ -2,6 +2,7 @@ package net.dirtcraft.discord.discordlink.Commands.Sources;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import net.dirtcraft.discord.discordlink.Utility.Utility;
 
 import java.util.Collection;
 import java.util.Queue;
@@ -15,7 +16,7 @@ public class ResponseScheduler {
 
     private ResponseScheduler() {
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new Messenger(), 0, 1250);
+        timer.scheduleAtFixedRate(new Messenger(), 1250, 1250);
     }
 
     public static void submit(ScheduledSender provider, String message) {
@@ -45,7 +46,8 @@ public class ResponseScheduler {
         private void dispatchMessages(ScheduledSender provider, Collection<String> messages){
             StringBuilder output = new StringBuilder();
             for (String message : messages){
-                if (output.length() + message.length() > 1800){
+                if (provider.sanitise()) message = Utility.sanitiseMinecraftText(message);
+                if (output.length() + message.length() > provider.getCharLimit()){
                     provider.sendDiscordResponse(output.toString());
                     output = new StringBuilder(message);
                 } else {
