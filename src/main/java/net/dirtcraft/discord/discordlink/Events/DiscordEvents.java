@@ -6,9 +6,9 @@ import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
@@ -52,7 +52,7 @@ public class DiscordEvents extends ListenerAdapter {
                     .execute(() -> discordToMc(sender, message))
                     .submit(DiscordLink.getInstance());
         } else if (action == ActionType.DISCORD) {
-            commandManager.process(sender, action.getCommand(event), event);
+            commandManager.process(sender, action.getCommand(event));
         } else if (!action.proxy && started) {
             toConsole(event, sender, action);
         }

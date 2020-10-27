@@ -5,10 +5,10 @@ import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -58,10 +58,10 @@ public class UnVerify implements CommandExecutor {
                         Role donorRole = guild.getRoleById(PluginConfiguration.Roles.donatorRoleID);
 
                         if (member.getRoles().contains(verifiedRole)) {
-                            guild.getController().removeSingleRoleFromMember(guild.getMemberById(discordID), verifiedRole).queue();
+                            guild.removeRoleFromMember(guild.getMemberById(discordID), verifiedRole).queue();
                         }
                         if (member.getRoles().contains(donorRole)) {
-                            guild.getController().removeSingleRoleFromMember(member, donorRole).queue();
+                            guild.removeRoleFromMember(member, donorRole).queue();
                         }
                     }
 

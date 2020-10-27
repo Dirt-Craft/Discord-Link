@@ -3,9 +3,8 @@ package net.dirtcraft.discord.discordlink.Events;
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
-import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.requests.RequestFuture;
-import net.dv8tion.jda.core.requests.RestAction;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -24,7 +23,7 @@ public class ServerBootHandler {
     private final long time = System.currentTimeMillis();
     private volatile GameState state = null;
 
-    private RequestFuture<Message> future;
+    private CompletableFuture<Message> future;
 
     public void startTimer(final GameState state){
         this.state = state;

@@ -3,12 +3,12 @@ package net.dirtcraft.discord.discordlink.Commands.Discord;
 import io.github.nucleuspowered.nucleus.api.NucleusAPI;
 import io.github.nucleuspowered.nucleus.api.service.NucleusAFKService;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
+import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
@@ -19,7 +19,7 @@ import java.util.List;
 
 public class PlayerList implements DiscordCommandExecutor {
     @Override
-    public void execute(GuildMember source, List<String> args, MessageReceivedEvent event) {
+    public void execute(MessageSource source, String command, List<String> args) {
         final Collection<Player> players = Sponge.getServer().getOnlinePlayers();
         final NucleusAFKService afkService = NucleusAPI.getAFKService().orElse(null);
         final ArrayList<String> playerNames = new ArrayList<>();
@@ -40,7 +40,7 @@ public class PlayerList implements DiscordCommandExecutor {
         } else {
             embed.setDescription("There are no players playing **" + SpongeDiscordLib.getServerName() + "**!");
         }
-        embed.setFooter("Requested By: " + source.getUser().getAsTag(), event.getAuthor().getAvatarUrl());
+        embed.setFooter("Requested By: " + source.getUser().getAsTag(), source.getUser().getAvatarUrl());
 
         DiscordLink
                 .getJDA()

@@ -1,9 +1,9 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
+import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
+import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
-import net.dirtcraft.discord.discordlink.Utility.Utility;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.util.List;
@@ -16,8 +16,8 @@ public class StopServer implements DiscordCommandExecutor {
     }
 
     @Override
-    public void execute(GuildMember source, List<String> args, MessageReceivedEvent event) {
-        Utility.sendResponse(event, "Attempting to reboot the server.", 15);
+    public void execute(MessageSource source, String command, List<String> args) {
+        GameChat.sendEmbed("Discord-Link Reboot", "Attempting to reboot the server.", 15);
         try{
             Thread.sleep(50);
         } catch (InterruptedException e){

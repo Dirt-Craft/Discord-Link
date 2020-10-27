@@ -2,9 +2,9 @@ package net.dirtcraft.discord.discordlink.Commands.Discord;
 
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
+import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 public class Discord implements DiscordCommandExecutor {
     @Override
-    public void execute(GuildMember source, List<String> args, MessageReceivedEvent event) throws DiscordCommandException {
+    public void execute(MessageSource source, String command, List<String> args) throws DiscordCommandException {
         final UserStorageService userStorageService = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
         if (args.size() < 1) throw new DiscordCommandException("Invalid Minecraft name");
         final String minecraftIdentifier = args.get(0);

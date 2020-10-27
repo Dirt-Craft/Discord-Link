@@ -1,10 +1,10 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
 import net.dirtcraft.discord.discordlink.API.GuildMember;
+import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Commands.Sources.PrivateSender;
 import net.dirtcraft.discord.discordlink.DiscordLink;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
 
@@ -17,7 +17,7 @@ public class IngameCommand implements DiscordCommandExecutor {
         this.command = command;
     }
     @Override
-    public void execute(GuildMember source, List<String> args, MessageReceivedEvent event) {
+    public void execute(MessageSource source, String command, List<String> args) {
         PrivateSender sender = new PrivateSender(source, command);
         Task.builder()
                 .execute( () -> Sponge.getCommandManager().process(sender, command))

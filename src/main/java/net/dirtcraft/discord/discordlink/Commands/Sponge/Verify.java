@@ -5,11 +5,11 @@ import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.exceptions.HierarchyException;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.exceptions.HierarchyException;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -95,14 +95,14 @@ public class Verify implements CommandExecutor {
                         Member member = guild.getMemberById(discordID);
 
                         if (!member.getRoles().contains(verifiedRole)) {
-                            guild.getController().addSingleRoleToMember(member, verifiedRole).queue();
+                            guild.addRoleToMember(member, verifiedRole).queue();
                         }
                         if (player.hasPermission("discordlink.donator") && !member.getRoles().contains(donorRole)) {
-                            guild.getController().addSingleRoleToMember(member, donorRole).queue();
+                            guild.addRoleToMember(member, donorRole).queue();
                         }
                         if (!member.getRoles().contains(staffRole)) {
                             try {
-                                guild.getController().setNickname(member, player.getName()).queue();
+                                guild.modifyNickname(member, player.getName()).queue();
                             } catch (HierarchyException e){
                                 player.sendMessage(Utility.format("&cCould not modify discord name as your role exceeds the bots power level."));
                             }

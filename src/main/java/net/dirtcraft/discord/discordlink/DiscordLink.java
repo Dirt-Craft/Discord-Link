@@ -8,8 +8,8 @@ import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.Events.*;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
@@ -62,10 +62,8 @@ public class DiscordLink {
             logger.error("Dirt-Database-Lib is not installed! " + container.getName() + " will not load.");
             return;
         }
-
         this.configManager = new ConfigManager(loader);
         this.storage = new Storage();
-
         discordCommandManager = new DiscordCommandManager();
         getJDA().addEventListener(new DiscordEvents(discordCommandManager));
         logger.info("Discord Link initializing...");

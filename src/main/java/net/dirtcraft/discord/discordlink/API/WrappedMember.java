@@ -1,55 +1,80 @@
 package net.dirtcraft.discord.discordlink.API;
 
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.*;
+import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.Game;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.OffsetDateTime;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 
-public abstract class WrappedMember implements Member {
+public class WrappedMember implements Member {
     protected final Member member;
 
     public WrappedMember(Member member){
         this.member = member;
     }
 
+    @NotNull
     @Override
     public User getUser() {
         return member.getUser();
     }
 
+    @NotNull
     @Override
     public Guild getGuild() {
         return member.getGuild();
     }
 
+    @Nonnull
     @Override
-    public List<Permission> getPermissions() {
+    public EnumSet<Permission> getPermissions() {
         return member.getPermissions();
     }
 
+    @Nonnull
     @Override
-    public boolean hasPermission(Permission... permissions) {
+    public EnumSet<Permission> getPermissions(@Nonnull GuildChannel channel) {
+        return member.getPermissions(channel);
+    }
+
+    @Nonnull
+    @Override
+    public EnumSet<Permission> getPermissionsExplicit() {
+        return member.getPermissionsExplicit();
+    }
+
+    @Nonnull
+    @Override
+    public EnumSet<Permission> getPermissionsExplicit(@Nonnull GuildChannel channel) {
+        return member.getPermissionsExplicit(channel);
+    }
+
+    @Override
+    public boolean hasPermission(@NotNull Permission... permissions) {
         return member.hasPermission(permissions);
     }
 
     @Override
-    public boolean hasPermission(Collection<Permission> permissions) {
+    public boolean hasPermission(@NotNull Collection<Permission> permissions) {
         return member.hasPermission(permissions);
     }
 
     @Override
-    public boolean hasPermission(Channel channel, Permission... permissions) {
+    public boolean hasPermission(@Nonnull GuildChannel channel, @Nonnull Permission... permissions) {
         return member.hasPermission(channel, permissions);
     }
 
     @Override
-    public boolean hasPermission(Channel channel, Collection<Permission> permissions) {
+    public boolean hasPermission(@Nonnull GuildChannel channel, @Nonnull Collection<Permission> permissions) {
         return member.hasPermission(channel, permissions);
     }
 
@@ -58,9 +83,21 @@ public abstract class WrappedMember implements Member {
         return member.getJDA();
     }
 
+    @Nonnull
     @Override
-    public OffsetDateTime getJoinDate() {
-        return member.getJoinDate();
+    public OffsetDateTime getTimeJoined() {
+        return member.getTimeJoined();
+    }
+
+    @Override
+    public boolean hasTimeJoined() {
+        return member.hasTimeJoined();
+    }
+
+    @Nullable
+    @Override
+    public OffsetDateTime getTimeBoosted() {
+        return member.getTimeBoosted();
     }
 
     @Override
@@ -68,14 +105,28 @@ public abstract class WrappedMember implements Member {
         return member.getVoiceState();
     }
 
+    @Nonnull
     @Override
-    public Game getGame() {
-        return member.getGame();
+    public List<Activity> getActivities() {
+        return member.getActivities();
     }
 
+    @NotNull
     @Override
     public OnlineStatus getOnlineStatus() {
         return member.getOnlineStatus();
+    }
+
+    @Nonnull
+    @Override
+    public OnlineStatus getOnlineStatus(@Nonnull ClientType type) {
+        return member.getOnlineStatus(type);
+    }
+
+    @Nonnull
+    @Override
+    public EnumSet<ClientType> getActiveClients() {
+        return member.getActiveClients();
     }
 
     @Override
@@ -83,11 +134,13 @@ public abstract class WrappedMember implements Member {
         return member.getNickname();
     }
 
+    @NotNull
     @Override
     public String getEffectiveName() {
         return member.getEffectiveName();
     }
 
+    @Nonnull
     @Override
     public List<Role> getRoles() {
         return member.getRoles();
@@ -104,22 +157,17 @@ public abstract class WrappedMember implements Member {
     }
 
     @Override
-    public List<Permission> getPermissions(Channel channel) {
-        return member.getPermissions(channel);
+    public boolean canInteract(@NotNull Member member) {
+        return this.member.canInteract(member);
     }
 
     @Override
-    public boolean canInteract(Member member) {
-        return member.canInteract(member);
-    }
-
-    @Override
-    public boolean canInteract(Role role) {
+    public boolean canInteract(@NotNull Role role) {
         return member.canInteract(role);
     }
 
     @Override
-    public boolean canInteract(Emote emote) {
+    public boolean canInteract(@NotNull Emote emote) {
         return member.canInteract(emote);
     }
 
@@ -129,6 +177,7 @@ public abstract class WrappedMember implements Member {
         return member.getDefaultChannel();
     }
 
+    @NotNull
     @Override
     public String getAsMention() {
         return member.getAsMention();
@@ -137,5 +186,15 @@ public abstract class WrappedMember implements Member {
     @Override
     public boolean isOwner(){
         return member.isOwner();
+    }
+
+    @Override
+    public boolean isFake() {
+        return member.isFake();
+    }
+
+    @Override
+    public long getIdLong() {
+        return member.getIdLong();
     }
 }

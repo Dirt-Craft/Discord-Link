@@ -2,11 +2,11 @@ package net.dirtcraft.discord.discordlink.Commands;
 
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
+import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.Discord.*;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,23 +95,25 @@ public class DiscordCommandManager extends DiscordCommandTree {
         register(notify, "notify");
     }
 
-    public void process(GuildMember member, String args, MessageReceivedEvent event){
+    public void process(MessageSource member, String args){
         try {
             String[] command = args.toLowerCase().split(" ");
-            execute(member, new ArrayList<>(Arrays.asList(command)), event);
+            execute(member, null, new ArrayList<>(Arrays.asList(command)));
         } catch (Exception e){
-            sendCommandError(event, e.getMessage() != null ? e.getMessage() : "an error occurred while executing the command.");
+            sendCommandError(member, e.getMessage() != null ? e.getMessage() : "an error occurred while executing the command.");
+        } finally {
+            member.getMessage().delete().queue();
         }
     }
 
-    private void sendCommandError(MessageReceivedEvent event, String msg){
+    private void sendCommandError(MessageSource event, String msg){
         event.getMessage().delete().queue();
-        GameChat.sendMessage("<@" + event.getAuthor().getId() + ">, " + msg, 5);
+        GameChat.sendMessage("<@" + event.getUser().getId() + ">, " + msg, 5);
         DiscordLink.getJDA()
                 .getTextChannelsByName("command-log", true).get(0)
                 .sendMessage(Utility.embedBuilder()
                         .addField("__Tried Executing Command__", event.getMessage().getContentDisplay(), false)
-                        .setFooter(event.getAuthor().getAsTag(), event.getAuthor().getAvatarUrl())
+                        .setFooter(event.getUser().getAsTag(), event.getUser().getAvatarUrl())
                         .build())
                 .queue();
     }
