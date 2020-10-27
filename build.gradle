@@ -20,7 +20,6 @@ dependencies {
     compile 'org.spongepowered:spongeapi:7.2.0'
     compile 'br.net.fabiozumbi12.UltimateChat:UltimateChat-Sponge-7:1.9.1'
     compile 'com.github.NucleusPowered:Nucleus:1.14.0'
-    //compile 'com.github.Dirt-Craft:Sponge-Discord-Lib:deploy-SNAPSHOT'
     compile 'com.github.Dirt-Craft:Sponge-Discord-Lib:deploy-SNAPSHOT'
     compile 'com.github.Dirt-Craft:Dirt-Database-Lib:deploy-SNAPSHOT'
 }
