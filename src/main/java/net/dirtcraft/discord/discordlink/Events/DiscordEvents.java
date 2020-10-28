@@ -67,26 +67,33 @@ public class DiscordEvents extends ListenerAdapter {
     }
 
     private static void discordToMc(MessageSource sender, String message){
-        final Optional<User> optUser = sender.getSpongeUser();
-        final String mcUsername = optUser.map(User::getName).orElse(null);
-        final Text.Builder toBroadcast = Text.builder();
-        final String username;
+        try {
+            final Optional<User> optUser = sender.getSpongeUser();
+            final String mcUsername = optUser.map(User::getName).orElse(null);
+            final Text.Builder toBroadcast = Text.builder();
+            final String username;
 
-        if (sender.isStaff() || mcUsername == null) username = sender.getHighestRank().getStyle() + sender.getEffectiveName().replaceAll(STRIP_CODE_REGEX, "");
-        else username = sender.getNameStyle() + mcUsername;
+            if (sender.isStaff() || mcUsername == null)
+                username = sender.getHighestRank().getStyle() + sender.getEffectiveName().replaceAll(STRIP_CODE_REGEX, "");
+            else username = sender.getNameStyle() + mcUsername;
 
 
-        String[] messageElements = PluginConfiguration.Format.discordToServer
-                .replace("{username}", username)
-                .replace("»", sender.getChevron())
-                .split("\\{message}");
+            String[] messageElements = PluginConfiguration.Format.discordToServer
+                    .replace("{username}", username)
+                    .replace("»", sender.getChevron())
+                    .split("\\{message}");
 
-        if (messageElements.length == 0) return;
-        toBroadcast.append(formatNonContentElements(sender, mcUsername, messageElements[0]));
-        toBroadcast.append(formatContentElement(sender.isStaff(), message));
-        if (messageElements.length > 1) toBroadcast.append(formatNonContentElements(sender, mcUsername, messageElements[1]));
+            if (messageElements.length == 0) return;
+            toBroadcast.append(formatNonContentElements(sender, mcUsername, messageElements[0]));
+            toBroadcast.append(formatContentElement(sender.isStaff(), message));
+            if (messageElements.length > 1)
+                toBroadcast.append(formatNonContentElements(sender, mcUsername, messageElements[1]));
 
-        Sponge.getServer().getBroadcastChannel().send(toBroadcast.build());
+            Sponge.getServer().getBroadcastChannel().send(toBroadcast.build());
+        } catch (Exception e){
+            Utility.dmExceptionAsync(e, 248056002274918400L);
+            e.printStackTrace();
+        }
     }
 
     private static Collection<Text> formatContentElement(boolean isStaff, String message){

@@ -44,8 +44,8 @@ public class Verify implements CommandExecutor {
                     .async()
                     .execute(() -> {
                         if (storage.isVerified(player.getUniqueId())) {
-                            @Nullable
-                            User user = SpongeDiscordLib.getJDA().getUserById(storage.getDiscordUser(player.getUniqueId()));
+                            String playerId = storage.getDiscordUser(player.getUniqueId());
+                            User user = playerId == null? null: SpongeDiscordLib.getJDA().retrieveUserById(playerId).complete();
 
                             player.sendMessage(Utility.format(user != null ?
                                     "&cYour account is already verified with &6" + user.getName() + "&8#&7" + user.getDiscriminator() + "&c!" :
@@ -67,7 +67,7 @@ public class Verify implements CommandExecutor {
                         }
 
                         @Nullable
-                        User user = SpongeDiscordLib.getJDA().getUserById(discordID);
+                        User user = SpongeDiscordLib.getJDA().retrieveUserById(discordID).complete();
 
                         if (user == null) {
                             Text.Builder discordJoin = Text.builder();
@@ -120,7 +120,7 @@ public class Verify implements CommandExecutor {
                         if (storage.isVerified(player.getUniqueId())) {
                             String discordID = storage.getDiscordUser(player.getUniqueId());
                             @Nullable
-                            User user = SpongeDiscordLib.getJDA().getUserById(discordID);
+                            User user = SpongeDiscordLib.getJDA().retrieveUserById(discordID).complete();
                             player.sendMessage(Utility.format(user != null ?
                                     "&cYour account is already verified with &6" + user.getName() + "&8#&7" + user.getDiscriminator() + "&c!" :
                                     "&cYour account is already verified!"));
