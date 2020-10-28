@@ -35,32 +35,28 @@ public class UnVerify implements CommandExecutor {
         Task.builder()
                 .async()
                 .execute(() -> {
-                    if (!storage.isVerified(player.getUniqueId())) {
+                    String discordID;
+                    if (!storage.isVerified(player.getUniqueId()) || (discordID= storage.getDiscordUser(player.getUniqueId())) == null) {
                         player.sendMessage(Utility.format("&cYour account is not verified!"));
                         return;
                     }
 
-                    String discordID = storage.getDiscordUser(player.getUniqueId());
-
-                    storage.deleteRecord(player.getUniqueId());
-
-                    @Nullable
-                    User user = SpongeDiscordLib.getJDA().getUserById(discordID);
-
+                    User user = SpongeDiscordLib.getJDA().retrieveUserById(discordID).complete();
                     player.sendMessage(Utility.format(user != null ?
                             "&7The account &6" + user.getName() + "&8#&7" + user.getDiscriminator() + " has been &cunverified" :
                             "&7Your account has been &cunverified"));
 
                     if (user != null) {
                         Guild guild = SpongeDiscordLib.getJDA().getGuildById(PluginConfiguration.Main.discordServerID);
-                        Member member = guild.getMemberById(discordID);
+                        Member member = Utility.getMember(user).orElse(null);
+                        if (member == null || guild == null) return;
                         Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);
                         Role donorRole = guild.getRoleById(PluginConfiguration.Roles.donatorRoleID);
 
-                        if (member.getRoles().contains(verifiedRole)) {
-                            guild.removeRoleFromMember(guild.getMemberById(discordID), verifiedRole).queue();
+                        if (verifiedRole != null && member.getRoles().contains(verifiedRole)) {
+                            guild.removeRoleFromMember(member, verifiedRole).queue();
                         }
-                        if (member.getRoles().contains(donorRole)) {
+                        if (donorRole != null && member.getRoles().contains(donorRole)) {
                             guild.removeRoleFromMember(member, donorRole).queue();
                         }
                     }

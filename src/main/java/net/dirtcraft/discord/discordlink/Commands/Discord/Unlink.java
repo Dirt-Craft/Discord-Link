@@ -9,7 +9,9 @@ import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
+import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import org.spongepowered.api.entity.living.player.User;
 
@@ -40,9 +42,10 @@ public class Unlink implements DiscordCommandExecutor {
         final String discordID = args.get(0);
         Pattern pattern = Pattern.compile("<?@?!?(\\d+)>?");
         Matcher matcher = pattern.matcher(discordID);
-        if (!matcher.matches() || GameChat.getGuild().getMemberById(matcher.group(1)) == null) throw new DiscordCommandException("Invalid Discord ID");
+        Optional<Member> member;
+        if (!matcher.matches() || !(member = Utility.getMemberById(matcher.group(1))).isPresent()) throw new DiscordCommandException("Invalid Discord ID");
 
-        final GuildMember player = new GuildMember(GameChat.getGuild().getMemberById(matcher.group(1)));
+        final GuildMember player = new GuildMember(member.get());
         final Optional<User> user = player.getSpongeUser();
         String response;
         if (user.isPresent()) {
@@ -56,12 +59,12 @@ public class Unlink implements DiscordCommandExecutor {
         Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);
         Role donorRole = guild.getRoleById(PluginConfiguration.Roles.donatorRoleID);
 
-        if (player.getRoles().contains(verifiedRole)) {
+        if (verifiedRole != null && player.getRoles().contains(verifiedRole)) {
             guild.removeRoleFromMember(player, verifiedRole).queue();
         }
-        if (player.getRoles().contains(donorRole)) {
+        if (donorRole != null && player.getRoles().contains(donorRole)) {
             guild.removeRoleFromMember(player, donorRole).queue();
         }
-        GameChat.sendEmbed(null, "Successfully unlinked " + response + ".");
+        GameChat.sendEmbed("Discord-Link Verification:", "Successfully unlinked " + response + ".");
     }
 }

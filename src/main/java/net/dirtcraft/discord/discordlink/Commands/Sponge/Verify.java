@@ -44,8 +44,8 @@ public class Verify implements CommandExecutor {
                     .async()
                     .execute(() -> {
                         if (storage.isVerified(player.getUniqueId())) {
-                            @Nullable
-                            User user = SpongeDiscordLib.getJDA().getUserById(storage.getDiscordUser(player.getUniqueId()));
+                            String playerId = storage.getDiscordUser(player.getUniqueId());
+                            User user = playerId == null? null: SpongeDiscordLib.getJDA().retrieveUserById(playerId).complete();
 
                             player.sendMessage(Utility.format(user != null ?
                                     "&cYour account is already verified with &6" + user.getName() + "&8#&7" + user.getDiscriminator() + "&c!" :
@@ -67,7 +67,7 @@ public class Verify implements CommandExecutor {
                         }
 
                         @Nullable
-                        User user = SpongeDiscordLib.getJDA().getUserById(discordID);
+                        User user = SpongeDiscordLib.getJDA().retrieveUserById(discordID).complete();
 
                         if (user == null) {
                             Text.Builder discordJoin = Text.builder();
@@ -89,15 +89,18 @@ public class Verify implements CommandExecutor {
                         player.sendMessage(Utility.format("&7Successfully verified &6" + player.getName() + "&7 with &6" + discordName + "&8#&7" + discordTag));
 
                         Guild guild = SpongeDiscordLib.getJDA().getGuildById(PluginConfiguration.Main.discordServerID);
+                        Member member = Utility.getMember(user).orElse(null);
+                        if (guild == null || member == null) return;
+
                         Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);
                         Role staffRole = guild.getRoleById(PluginConfiguration.Roles.staffRoleID);
                         Role donorRole = guild.getRoleById(PluginConfiguration.Roles.donatorRoleID);
-                        Member member = guild.getMemberById(discordID);
 
-                        if (!member.getRoles().contains(verifiedRole)) {
+
+                        if (verifiedRole != null && !member.getRoles().contains(verifiedRole)) {
                             guild.addRoleToMember(member, verifiedRole).queue();
                         }
-                        if (player.hasPermission("discordlink.donator") && !member.getRoles().contains(donorRole)) {
+                        if (donorRole != null && player.hasPermission("discordlink.donator") && !member.getRoles().contains(donorRole)) {
                             guild.addRoleToMember(member, donorRole).queue();
                         }
                         if (!member.getRoles().contains(staffRole)) {
@@ -117,7 +120,7 @@ public class Verify implements CommandExecutor {
                         if (storage.isVerified(player.getUniqueId())) {
                             String discordID = storage.getDiscordUser(player.getUniqueId());
                             @Nullable
-                            User user = SpongeDiscordLib.getJDA().getUserById(discordID);
+                            User user = SpongeDiscordLib.getJDA().retrieveUserById(discordID).complete();
                             player.sendMessage(Utility.format(user != null ?
                                     "&cYour account is already verified with &6" + user.getName() + "&8#&7" + user.getDiscriminator() + "&c!" :
                                     "&cYour account is already verified!"));
