@@ -107,7 +107,6 @@ public class DiscordCommandManager extends DiscordCommandTree {
     }
 
     private void sendCommandError(MessageSource event, String msg){
-        event.getMessage().delete().queue();
         GameChat.sendMessage("<@" + event.getUser().getId() + ">, " + msg, 5);
         DiscordLink.getJDA()
                 .getTextChannelsByName("command-log", true).get(0)
