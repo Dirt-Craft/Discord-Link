@@ -89,15 +89,18 @@ public class Verify implements CommandExecutor {
                         player.sendMessage(Utility.format("&7Successfully verified &6" + player.getName() + "&7 with &6" + discordName + "&8#&7" + discordTag));
 
                         Guild guild = SpongeDiscordLib.getJDA().getGuildById(PluginConfiguration.Main.discordServerID);
+                        Member member = Utility.getMember(user).orElse(null);
+                        if (guild == null || member == null) return;
+
                         Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);
                         Role staffRole = guild.getRoleById(PluginConfiguration.Roles.staffRoleID);
                         Role donorRole = guild.getRoleById(PluginConfiguration.Roles.donatorRoleID);
-                        Member member = guild.getMemberById(discordID);
 
-                        if (!member.getRoles().contains(verifiedRole)) {
+
+                        if (verifiedRole != null && !member.getRoles().contains(verifiedRole)) {
                             guild.addRoleToMember(member, verifiedRole).queue();
                         }
-                        if (player.hasPermission("discordlink.donator") && !member.getRoles().contains(donorRole)) {
+                        if (donorRole != null && player.hasPermission("discordlink.donator") && !member.getRoles().contains(donorRole)) {
                             guild.addRoleToMember(member, donorRole).queue();
                         }
                         if (!member.getRoles().contains(staffRole)) {

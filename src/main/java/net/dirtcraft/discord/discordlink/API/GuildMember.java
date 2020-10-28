@@ -1,6 +1,7 @@
 package net.dirtcraft.discord.discordlink.API;
 
 import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
@@ -22,7 +23,7 @@ public class GuildMember extends WrappedMember {
         String memberID =  DiscordLink.getInstance().getStorage().getDiscordUser(player);
         if (memberID == null) return Optional.empty();
 
-        final Member member = DiscordLink.getGuild().getMemberById(memberID);
+        final Member member = Utility.getMemberById(memberID).orElse(null);
         if (member == null) return Optional.empty();
 
         final GuildMember profile = new GuildMember(member);

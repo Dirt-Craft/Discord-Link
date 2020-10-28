@@ -12,9 +12,10 @@ import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.spongediscordlib.DiscordUtil;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.requests.RestAction;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -22,12 +23,40 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.awt.*;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class Utility {
 
     public static final String STRIP_CODE_REGEX = "[§&]([0-9a-fA-FrlonmkRLONMK])";
     public static final String URL_DETECT_REGEX = "((https?|ftp|gopher|telnet|file):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
+
+    public static Optional<Member> getMemberById(String id){
+        try {
+            return Optional.of(DiscordLink.getGuild().retrieveMemberById(id).complete());
+        } catch (Exception e){
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<Member> getMemberById(long id){
+        try {
+            return Optional.of(DiscordLink.getGuild().retrieveMemberById(id).complete());
+        } catch (Exception e){
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<Member> getMember(User user){
+        try {
+            return Optional.of(DiscordLink.getGuild().retrieveMember(user).complete());
+        } catch (Exception e){
+            return Optional.empty();
+        }
+    }
 
     public static EmbedBuilder embedBuilder() {
         EmbedBuilder embed = new EmbedBuilder();
@@ -118,5 +147,38 @@ public class Utility {
                 .replace("@here", "")
                 .replaceAll("([_*~`>|\\\\])", "\\\\$1")
                 .replaceAll("<@\\d+>", "");
+    }
+
+    public static void dmExceptionAsync(Exception e, long... id){
+        CompletableFuture.runAsync(()->dmException(e, id));
+    }
+
+    private static void dmException(Exception e, long... id){
+        Arrays.stream(id)
+                .mapToObj(Utility::getMemberById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(Member::getUser)
+                .map(User::openPrivateChannel)
+                .forEach(dm->dmException(dm, e));
+    }
+
+    private static void dmException(RestAction<PrivateChannel> dms, Exception e){
+        String[] ex = ExceptionUtils.getStackTrace(e).split("\\r?\\n");
+        sendMessages(s->dms.queue(dm->dm.sendMessage(s).queue()), 1980, ex);
+    }
+
+    public static void sendMessages(Consumer<String> destination, int limit, String... messages){
+        StringBuilder sb = new StringBuilder();
+        for (String s : messages) {
+            if (sb.length() + s.length() < limit){
+                sb.append(s);
+                sb.append("\n");
+            } else {
+                destination.accept(sb.toString());
+                sb = new StringBuilder(s);
+            }
+        }
+        if (sb.length() > 0) destination.accept(sb.toString());
     }
 }

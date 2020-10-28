@@ -24,7 +24,6 @@ public class DiscordCommand {
     }
 
     private void sendPermissionError(MessageSource event){
-        event.getMessage().delete().queue();
         GameChat.sendMessage("<@" + event.getUser().getId() + ">, you do **not** have permission to use this command!", 5);
         DiscordLink.getJDA()
                 .getTextChannelsByName("command-log", true).get(0)
@@ -37,7 +36,6 @@ public class DiscordCommand {
     }
 
     private void sendCommandError(MessageSource event, String msg){
-        event.getMessage().delete().queue();
         GameChat.sendMessage("<@" + event.getUser().getId() + ">, " + msg, 5);
         DiscordLink.getJDA()
                 .getTextChannelsByName("command-log", true).get(0)

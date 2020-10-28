@@ -5,6 +5,8 @@ import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
+import net.dirtcraft.discord.discordlink.Utility.Utility;
+import net.dv8tion.jda.api.entities.Member;
 import org.spongepowered.api.entity.living.player.User;
 
 import java.util.List;
@@ -19,11 +21,12 @@ public class Username implements DiscordCommandExecutor {
         final String discordID = args.get(0);
         Pattern pattern = Pattern.compile("<?@?!?(\\d+)>?");
         Matcher matcher = pattern.matcher(discordID);
-        if (!matcher.matches() || GameChat.getGuild().getMemberById(matcher.group(1)) == null) throw new DiscordCommandException("Invalid Discord ID");
+        Optional<Member> member;
+        if (!matcher.matches() || !(member = Utility.getMemberById(matcher.group(1))).isPresent()) throw new DiscordCommandException("Invalid Discord ID");
 
-        final GuildMember player = new GuildMember(GameChat.getGuild().getMemberById(matcher.group(1)));
+        final GuildMember player = new GuildMember(member.get());
         final Optional<User> user = player.getSpongeUser();
         if (!user.isPresent()) throw new DiscordCommandException("The user was not verified!");
-        GameChat.sendEmbed(null, user.get().getName());
+        GameChat.sendEmbed("Minecraft Username:", user.get().getName());
     }
 }

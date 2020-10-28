@@ -12,6 +12,7 @@ import org.spongepowered.api.event.game.state.*;
 
 import java.awt.*;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Notifier.*;
@@ -34,8 +35,9 @@ public class ServerBootHandler {
                 if (!notify.contains(248056002274918400L))notify.add(248056002274918400L);
                 if (!notify.contains(261928443179040768L))notify.add(261928443179040768L);
                 notify.stream()
-                        .map(GameChat.getGuild()::getMemberById)
-                        .filter(Objects::nonNull)
+                        .map(Utility::getMemberById)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
                         .map(Member::getUser)
                         .map(User::openPrivateChannel)
                         .forEach(this::sendMessage);

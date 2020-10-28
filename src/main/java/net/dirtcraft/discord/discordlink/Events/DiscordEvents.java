@@ -6,9 +6,11 @@ import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
@@ -35,27 +37,33 @@ public class DiscordEvents extends ListenerAdapter {
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
-        if (!event.getChannel().equals(GameChat.getChannel())) return;
-        if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
-        if (hasAttachment(event)) return;
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        try {
+            if (!event.getChannel().equals(GameChat.getChannel())) return;
+            if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
+            if (hasAttachment(event)) return;
 
-        final MessageSource sender = new MessageSource(event);
-        final boolean started = Sponge.getGame().getState() == GameState.SERVER_STARTED;
-        final String message = event.getMessage().getContentDisplay();
-        final String rawMessage = event.getMessage().getContentRaw();
-        final ActionType action = ActionType.fromMessageRaw(rawMessage);
+            final MessageSource sender = new MessageSource(event);
+            final boolean started = Sponge.getGame().getState() == GameState.SERVER_STARTED;
+            final String message = event.getMessage().getContentDisplay();
+            final String rawMessage = event.getMessage().getContentRaw();
+            final ActionType action = ActionType.fromMessageRaw(rawMessage);
 
-        if (action == ActionType.CHAT && started){
-            Task.builder()
-                    .async()
-                    .execute(() -> discordToMc(sender, message))
-                    .submit(DiscordLink.getInstance());
-        } else if (action == ActionType.DISCORD) {
-            commandManager.process(sender, action.getCommand(event));
-        } else if (!action.proxy && started) {
-            toConsole(event, sender, action);
+
+            if (action == ActionType.CHAT && started) discordToMCAsync(sender, message);
+            else if (action == ActionType.DISCORD) commandManager.process(sender, action.getCommand(event));
+            else if (!action.proxy && started) toConsole(event, sender, action);
+        } catch (Exception e){
+            Utility.dmExceptionAsync(e, 248056002274918400L);
+            throw e;
         }
+    }
+
+    private static void discordToMCAsync(MessageSource sender, String message){
+        Task.builder()
+                .async()
+                .execute(() -> discordToMc(sender, message))
+                .submit(DiscordLink.getInstance());
     }
 
     private static void discordToMc(MessageSource sender, String message){
