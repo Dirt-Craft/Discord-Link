@@ -2,8 +2,6 @@ package net.dirtcraft.discord.discordlink.API;
 
 import net.dv8tion.jda.api.entities.Role;
 
-import javax.annotation.Nullable;
-
 import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Roles.*;
 
 public enum Roles {
@@ -17,20 +15,20 @@ public enum Roles {
     VERIFIED(verifiedRoleID,false,'7',"Verified"        ),
     NONE    (null,      false,'7',"None"            );
 
-    private final Role id;
+    private final long id;
     private final String name;
     private final char color;
     private final boolean isStaff;
 
     Roles(String id, boolean isStaff, char color, String name){
-        this.id = id == null ? null : GameChat.getGuild().getRoleById(id);
+        this.id = id == null ? -1 : Long.parseLong(id);
         this.name = name;
         this.color = color;
         this.isStaff = isStaff;
     }
 
-    @Nullable public Role getRole(){
-        return id;
+    public Role getRole(){
+        return GameChat.getGuild().getRoleById(id);
     }
 
     public String getName(){

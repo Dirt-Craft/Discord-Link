@@ -1,11 +1,6 @@
 package net.dirtcraft.discord.discordlink.Utility;
 
-import net.dirtcraft.discord.discordlink.API.ActionType;
-import net.dirtcraft.discord.discordlink.API.GameChat;
-import net.dirtcraft.discord.discordlink.API.GuildMember;
-import net.dirtcraft.discord.discordlink.API.Roles;
-import net.dirtcraft.discord.discordlink.Commands.Sources.GamechatSender;
-import net.dirtcraft.discord.discordlink.Commands.Sources.PrivateSender;
+import net.dirtcraft.discord.discordlink.API.*;
 import net.dirtcraft.discord.discordlink.Commands.Sources.WrappedConsole;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
@@ -13,7 +8,6 @@ import net.dirtcraft.discord.spongediscordlib.DiscordUtil;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.spongepowered.api.Sponge;
@@ -24,10 +18,12 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import java.awt.*;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+
+import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Command.blacklist;
+import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Command.ignored;
 
 public class Utility {
 
@@ -36,7 +32,7 @@ public class Utility {
 
     public static Optional<Member> getMemberById(String id){
         try {
-            return Optional.of(DiscordLink.getGuild().retrieveMemberById(id).complete());
+            return Optional.of(GameChat.getGuild().retrieveMemberById(id).complete());
         } catch (Exception e){
             return Optional.empty();
         }
@@ -44,7 +40,7 @@ public class Utility {
 
     public static Optional<Member> getMemberById(long id){
         try {
-            return Optional.of(DiscordLink.getGuild().retrieveMemberById(id).complete());
+            return Optional.of(GameChat.getGuild().retrieveMemberById(id).complete());
         } catch (Exception e){
             return Optional.empty();
         }
@@ -52,7 +48,7 @@ public class Utility {
 
     public static Optional<Member> getMember(User user){
         try {
-            return Optional.of(DiscordLink.getGuild().retrieveMember(user).complete());
+            return Optional.of(GameChat.getGuild().retrieveMember(user).complete());
         } catch (Exception e){
             return Optional.empty();
         }
@@ -69,9 +65,7 @@ public class Utility {
     }
 
     public static void setTopic() {
-        TextChannel channel = DiscordLink
-                .getJDA()
-                .getTextChannelById(SpongeDiscordLib.getGamechatChannelID());
+        TextChannel channel = GameChat.getChannel();
         if (SpongeDiscordLib.getServerName().toLowerCase().contains("pixel")) {
             String name = SpongeDiscordLib.getServerName().split(" ")[1];
             String code = SpongeDiscordLib.getServerName().toLowerCase().split(" ")[1];
@@ -102,37 +96,45 @@ public class Utility {
         DiscordUtil.setStatus(Activity.ActivityType.STREAMING, SpongeDiscordLib.getServerName(), "https://www.twitch.tv/dirtcraft/");
     }
 
-    public static void toConsole(MessageReceivedEvent event, GuildMember sender, ActionType type) {
-        final List<String> blacklist = PluginConfiguration.Command.blacklist;
-        final String command = type.getCommand(event);
-        if (PluginConfiguration.Command.ignored.stream().anyMatch(command::startsWith)) return;
-        if (sender.hasRole(Roles.DIRTY) || sender.hasRole(Roles.ADMIN) && blacklist.stream().noneMatch(command::startsWith)) {
-            final WrappedConsole commandSender = type.silent ? new PrivateSender(sender, command) : new GamechatSender(sender, command);
-            Task.builder()
-                    .execute(() -> Sponge.getCommandManager().process(commandSender, command))
-                    .submit(DiscordLink.getInstance());
+    public static boolean toConsole(String command, MessageSource sender, Action type) {
+        if (ignored.stream().anyMatch(command::startsWith)) return false;
+        if (canUseCommand(sender, command)) {
+            final WrappedConsole commandSender = type.getSender(sender, command);
+            toConsole(commandSender, command);
+            return true;
         } else {
-            sendPermissionErrorMessage(event);
+            sendPermissionError(sender);
+            return false;
         }
     }
 
-    public static void sendResponse(MessageReceivedEvent event, String error){
-        sendResponse(event, error, 30);
+    public static void toConsole(WrappedConsole commandSender, String command) {
+        Task.builder()
+                .execute(() -> Sponge.getCommandManager().process(commandSender, command))
+                .submit(DiscordLink.getInstance());
     }
 
-    public static void sendResponse(MessageReceivedEvent event, String error, int delay){
-        event.getMessage().delete().queue();
-        GameChat.sendMessage("<@" + event.getAuthor().getId() + ">, " + error, delay);
+    private static boolean canUseCommand(GuildMember sender, String command){
+        return sender.hasRole(Roles.DIRTY) ||
+               sender.hasRole(Roles.ADMIN) && blacklist.stream().noneMatch(command::startsWith);
     }
 
-    public static void sendPermissionErrorMessage(MessageReceivedEvent event){
-        event.getMessage().delete().queue();
-        GameChat.sendMessage("<@" + event.getAuthor().getId() + ">, you do **not** have permission to use this command!", 5);
+    public static void sendPermissionError(MessageSource event){
+        GameChat.sendMessage("<@" + event.getUser().getId() + ">, you do **not** have permission to use this command!", 5);
+        logCommand(event, "__Tried Executing Command__");
+    }
+
+    public static void sendCommandError(MessageSource event, String msg){
+        GameChat.sendMessage("<@" + event.getUser().getId() + ">, " + msg, 5);
+        logCommand(event, "__Tried Executing Command__");
+    }
+
+    public static void logCommand(MessageSource event, String message){
         DiscordLink.getJDA()
                 .getTextChannelsByName("command-log", true).get(0)
                 .sendMessage(Utility.embedBuilder()
-                        .addField("__Tried Executing Command__", event.getMessage().getContentDisplay(), false)
-                        .setFooter(event.getAuthor().getAsTag(), event.getAuthor().getAvatarUrl())
+                        .addField(message, event.getMessage().getContentDisplay(), false)
+                        .setFooter(event.getUser().getAsTag(), event.getUser().getAvatarUrl())
                         .build())
                 .queue();
     }

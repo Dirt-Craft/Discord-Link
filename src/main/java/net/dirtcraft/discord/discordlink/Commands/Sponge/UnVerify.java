@@ -17,8 +17,6 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 
-import javax.annotation.Nullable;
-
 public class UnVerify implements CommandExecutor {
 
     private final Storage storage;

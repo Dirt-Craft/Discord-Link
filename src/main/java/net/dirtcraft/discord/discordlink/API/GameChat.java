@@ -12,31 +12,32 @@ import java.util.concurrent.TimeUnit;
 
 public class GameChat {
 
-    private static final TextChannel channel = DiscordLink.getJDA().getTextChannelById(SpongeDiscordLib.getGamechatChannelID());
+    private static final long channel = Long.parseLong(SpongeDiscordLib.getGamechatChannelID());
+    private static final long guild = getChannel().getGuild().getIdLong();
 
     public static TextChannel getChannel(){
-        return channel;
+        return DiscordLink.getJDA().getTextChannelById(channel);
     }
 
     public static Guild getGuild(){
-        return channel.getGuild();
+        return DiscordLink.getJDA().getGuildById(guild);
     }
 
     public static void sendMessage(MessageEmbed embed) {
-        channel.sendMessage(embed).queue();
+        getChannel().sendMessage(embed).queue();
     }
 
 
     public static void sendMessage(String message) {
-        channel.sendMessage(message).queue();
+        getChannel().sendMessage(message).queue();
     }
 
     public static void sendMessage(String message, int duration) {
-        channel.sendMessage(message).queue(msg -> msg.delete().queueAfter(duration, TimeUnit.SECONDS));
+        getChannel().sendMessage(message).queue(msg -> msg.delete().queueAfter(duration, TimeUnit.SECONDS));
     }
 
     public static void sendMessage(MessageEmbed embed, int duration) {
-        channel.sendMessage(embed).queue(msg -> msg.delete().queueAfter(duration, TimeUnit.SECONDS));
+        getChannel().sendMessage(embed).queue(msg -> msg.delete().queueAfter(duration, TimeUnit.SECONDS));
 
     }
 
@@ -47,7 +48,7 @@ public class GameChat {
                 .addField(header, message, false)
                 //.setFooter(event.getAuthor().getAsTag(), event.getAuthor().getAvatarUrl())
                 .build();
-        channel.sendMessage(embed).queue(msg -> msg.delete().queueAfter(duration, TimeUnit.SECONDS));
+        getChannel().sendMessage(embed).queue(msg -> msg.delete().queueAfter(duration, TimeUnit.SECONDS));
     }
 
     public static void sendEmbed(String header, String message) {
@@ -56,7 +57,7 @@ public class GameChat {
                 .addField(header, message, false)
                 //.setFooter(event.getAuthor().getAsTag(), event.getAuthor().getAvatarUrl())
                 .build();
-        channel.sendMessage(embed).queue();
+        getChannel().sendMessage(embed).queue();
     }
 
     public static void sendPlayerMessage(String prefix, String playerName, String message) {
@@ -64,6 +65,6 @@ public class GameChat {
                 .replace("{prefix}", prefix)
                 .replace("{username}", playerName)
                 .replace("{message}", message);
-        channel.sendMessage(output).queue();
+        getChannel().sendMessage(output).queue();
     }
 }
