@@ -1,6 +1,7 @@
 package net.dirtcraft.discord.discordlink.Events;
 
 import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.entities.*;
@@ -79,11 +80,14 @@ public class ServerBootHandler {
                 .setColor(Color.ORANGE)
                 .setDescription("The server is currently booting... Please wait...\n**" + state + "** ("+ order + "/7)")
                 .build();
-        if (future != null) future.whenComplete((message, throwable) -> message.delete().queue());
-        future = GameChat.getChannel().sendMessage(embed).submit();
+        if (future != null) future = future
+                .whenComplete((message, throwable) -> message.delete().queue())
+                .thenApply(message -> GameChat.getChannel().sendMessage(embed).complete());
+        else future = GameChat.getChannel().sendMessage(embed).submit();
     }
 
     private void sendMessage(RestAction<PrivateChannel> channelRestAction){
+        if (DiscordLink.getJDA() == null) return;
         try {
             long ms = (System.currentTimeMillis() - time);
             double minutes = (double) Math.max(ms, 1) / minute;
@@ -96,6 +100,7 @@ public class ServerBootHandler {
     }
 
     public void startTimer(final GameState state){
+        if (DiscordLink.getJDA() == null) return;
         this.state = state;
         CompletableFuture.runAsync(()->{
             try{

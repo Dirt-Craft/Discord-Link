@@ -76,8 +76,10 @@ public class DiscordLink extends ServerBootHandler {
         logger.info("Discord Link initialized");
     }
 
+    @Override
     @Listener(order = Order.PRE)
-    public void onGameInit(GameInitializationEvent event) {
+    public void onGameInitialization(GameInitializationEvent event) {
+        super.onGameInitialization(event);
         if (instance == null) return;
         Sponge.getEventManager().registerListeners(instance, new SpongeEvents(instance, storage));
         this.registerCommands();
