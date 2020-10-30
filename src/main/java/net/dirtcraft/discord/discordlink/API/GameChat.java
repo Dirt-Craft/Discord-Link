@@ -4,9 +4,7 @@ import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
 
 import java.util.concurrent.TimeUnit;
 
@@ -17,6 +15,10 @@ public class GameChat {
 
     public static TextChannel getChannel(){
         return DiscordLink.getJDA().getTextChannelById(channel);
+    }
+
+    public static boolean isGamechat(MessageChannel channel){
+        return channel.getIdLong() == GameChat.channel;
     }
 
     public static Guild getGuild(){

@@ -40,19 +40,18 @@ import org.spongepowered.api.text.Text;
         }
 )
 public class DiscordLink {
+    private static DiscordLink instance;
+    private static JDA jda;
 
     @DefaultConfig(sharedRoot = false)
     @Inject private ConfigurationLoader<CommentedConfigurationNode> loader;
     @Inject private Logger logger;
     @Inject private PluginContainer container;
-
-    private static DiscordLink instance;
     private ConfigManager configManager;
     private Storage storage;
 
     @Listener (order = Order.AFTER_PRE)
     public void onPreInit(GameConstructionEvent event) {
-        instance = this;
         logger.info("Discord Link initializing...");
         if (!Sponge.getPluginManager().isLoaded("sponge-discord-lib")) {
             logger.error("Sponge-Discord-Lib is not installed! " + container.getName() + " will not load.");
@@ -62,19 +61,22 @@ public class DiscordLink {
             logger.error("Dirt-Database-Lib is not installed! " + container.getName() + " will not load.");
             return;
         }
+        if ((jda = SpongeDiscordLib.getJDA()) == null) {
+            logger.error("JDA failed to connect to discord gateway! " + container.getName() + " will not load.");
+            return;
+        }
         this.configManager = new ConfigManager(loader);
         this.storage = new Storage();
-        getJDA().addEventListener(new DiscordEvents());
-        logger.info("Discord Link initialized");
-    }
+        instance = this;
 
-    @Listener(order = Order.FIRST)
-    public void onConstruction(GameConstructionEvent event){
-        Sponge.getEventManager().registerListeners(instance, new ServerBootHandler());
+        getJDA().addEventListener(new DiscordEvents());
+        Sponge.getEventManager().registerListeners(instance, new ServerBootHandler(event));
+        logger.info("Discord Link initialized");
     }
 
     @Listener(order = Order.PRE)
     public void onGameInit(GameInitializationEvent event) {
+        if (instance == null) return;
         Sponge.getEventManager().registerListeners(instance, new SpongeEvents(instance, storage));
         this.registerCommands();
         Utility.setStatus();
@@ -85,22 +87,6 @@ public class DiscordLink {
         } else {
             Sponge.getEventManager().registerListeners(instance, new UltimateChat());
         }
-    }
-
-    public static JDA getJDA() {
-        return SpongeDiscordLib.getJDA();
-    }
-
-    public static DiscordLink getInstance() {
-        return instance;
-    }
-
-    public Storage getStorage(){
-        return storage;
-    }
-
-    public void saveConfig(){
-        configManager.save();
     }
 
     private void registerCommands(){
@@ -117,6 +103,22 @@ public class DiscordLink {
 
         Sponge.getCommandManager().register(this, verify, "verify", "link");
         Sponge.getCommandManager().register(this, unverify, "unverify", "unlink");
+    }
+
+    public void saveConfig(){
+        configManager.save();
+    }
+
+    public Storage getStorage(){
+        return storage;
+    }
+
+    public static DiscordLink getInstance() {
+        return instance;
+    }
+
+    public static JDA getJDA() {
+        return jda;
     }
 
 }
