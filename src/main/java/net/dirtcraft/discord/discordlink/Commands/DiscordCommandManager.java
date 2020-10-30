@@ -26,12 +26,14 @@ public class DiscordCommandManager extends DiscordCommandTree {
         DiscordCommand halt = DiscordCommand.builder()
                 .setDescription("Stops the server abruptly.")
                 .setCommandExecutor(new StopServer(false))
+                .setPreBootEnabled(true)
                 .setRequiredRoles(Roles.ADMIN)
                 .build();
 
         DiscordCommand stop = DiscordCommand.builder()
                 .setDescription("Stops the server gracefully.")
                 .setCommandExecutor(new StopServer(true))
+                .setPreBootEnabled(true)
                 .setRequiredRoles(Roles.ADMIN)
                 .build();
 
@@ -44,18 +46,21 @@ public class DiscordCommandManager extends DiscordCommandTree {
         DiscordCommand seen = DiscordCommand.builder()
                 .setDescription("Sends you a DM with a players info.")
                 .setCommandExecutor(new SilentSeen())
+                .setCommandUsage("<Player>")
                 .setRequiredRoles(Roles.STAFF)
                 .build();
 
         DiscordCommand username = DiscordCommand.builder()
                 .setDescription("Reveals a verified players minecraft username.")
                 .setCommandExecutor(new Username())
+                .setCommandUsage("<@Discord>")
                 .setRequiredRoles(Roles.STAFF)
                 .build();
 
         DiscordCommand discord = DiscordCommand.builder()
                 .setDescription("Reveals a verified players discord username.")
                 .setCommandExecutor(new Discord())
+                .setCommandUsage("<Player>")
                 .setRequiredRoles(Roles.STAFF)
                 .build();
 
@@ -77,7 +82,8 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .build();
 
         DiscordCommand notify = DiscordCommand.builder()
-                .setDescription("Manages notification settings.")
+                .setDescription("Shows server-boot notifier commands")
+                .setPreBootEnabled(true)
                 .setCommandExecutor(new NotifyBase())
                 .build();
 
@@ -112,7 +118,8 @@ public class DiscordCommandManager extends DiscordCommandTree {
         String pre = PluginConfiguration.Main.discordCommand;
         getCommandMap().forEach((alias, cmd)->{
             if (!cmd.hasPermission(member)) return;
-            embed.addField(pre + alias, cmd.getDescription(), false);
+            String title = pre + alias + " " + cmd.getUsage();
+            embed.addField(title, cmd.getDescription(), false);
         });
         GameChat.sendMessage(embed.build());
     }

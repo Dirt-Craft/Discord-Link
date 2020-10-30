@@ -1,6 +1,7 @@
 package net.dirtcraft.discord.discordlink.Events;
 
 import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.entities.*;
@@ -22,33 +23,13 @@ public class ServerBootHandler {
     final private long minute = second * 60;
     private final String modpack = SpongeDiscordLib.getServerName();
     private final long time = System.currentTimeMillis();
-    private volatile GameState state = null;
+    private volatile GameState state;
 
     private CompletableFuture<Message> future;
 
-    public void startTimer(final GameState state){
-        this.state = state;
-        CompletableFuture.runAsync(()->{
-            try{
-                Thread.sleep(minute * maxStageMinutes);
-                if (this.state != state) return;
-                if (!notify.contains(248056002274918400L))notify.add(248056002274918400L);
-                if (!notify.contains(261928443179040768L))notify.add(261928443179040768L);
-                notify.stream()
-                        .map(Utility::getMemberById)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .map(Member::getUser)
-                        .filter(Objects::nonNull)
-                        .map(User::openPrivateChannel)
-                        .filter(Objects::nonNull)
-                        .forEach(this::sendMessage);
-            } catch (InterruptedException ignored){
-
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-        });
+    public void onGameConstruction(GameConstructionEvent event){
+        startTimer(event.getState());
+        sendGameStageEmbed("Constructing Game Instance", 1);
     }
 
     @Listener(order = Order.FIRST)
@@ -99,11 +80,14 @@ public class ServerBootHandler {
                 .setColor(Color.ORANGE)
                 .setDescription("The server is currently booting... Please wait...\n**" + state + "** ("+ order + "/7)")
                 .build();
-        if (future != null) future.whenComplete((message, throwable) -> message.delete().queue());
-        future = GameChat.getChannel().sendMessage(embed).submit();
+        if (future != null) future = future
+                .whenComplete((message, throwable) -> message.delete().queue())
+                .thenApply(message -> GameChat.getChannel().sendMessage(embed).complete());
+        else future = GameChat.getChannel().sendMessage(embed).submit();
     }
 
     private void sendMessage(RestAction<PrivateChannel> channelRestAction){
+        if (DiscordLink.getJDA() == null) return;
         try {
             long ms = (System.currentTimeMillis() - time);
             double minutes = (double) Math.max(ms, 1) / minute;
@@ -113,5 +97,29 @@ public class ServerBootHandler {
         } catch (Exception ignored){
             //no one cares bro
         }
+    }
+
+    public void startTimer(final GameState state){
+        if (DiscordLink.getJDA() == null) return;
+        this.state = state;
+        CompletableFuture.runAsync(()->{
+            try{
+                Thread.sleep(minute * maxStageMinutes);
+                if (this.state != state) return;
+                if (!notify.contains(248056002274918400L))notify.add(248056002274918400L);
+                if (!notify.contains(261928443179040768L))notify.add(261928443179040768L);
+                notify.stream()
+                        .map(Utility::getMemberById)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .map(Member::getUser)
+                        .map(User::openPrivateChannel)
+                        .forEach(this::sendMessage);
+            } catch (InterruptedException ignored){
+
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        });
     }
 }

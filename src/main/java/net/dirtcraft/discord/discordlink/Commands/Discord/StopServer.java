@@ -6,6 +6,7 @@ import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class StopServer implements DiscordCommandExecutor {
     private final boolean gracefulExit;
@@ -16,12 +17,14 @@ public class StopServer implements DiscordCommandExecutor {
 
     @Override
     public void execute(MessageSource source, String command, List<String> args) {
-        GameChat.sendEmbed("Discord-Link Reboot", "Attempting to reboot the server.", 15);
-        try{
-            Thread.sleep(50);
-        } catch (InterruptedException e){
-            e.printStackTrace();
+        try {
+            GameChat.sendEmbed("Discord-Link Reboot", "Attempting to reboot the server.");
+            source.getMessage().delete().queue(s->{},e->{});
+            Thread.sleep(555);
+        } catch (Throwable ignored){
+
+        } finally {
+            CompletableFuture.runAsync(()->FMLCommonHandler.instance().exitJava(-1, !gracefulExit));
         }
-        FMLCommonHandler.instance().exitJava(-1, !gracefulExit);
     }
 }
