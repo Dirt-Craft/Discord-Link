@@ -28,7 +28,7 @@ public class ServerBootHandler {
 
     public void onGameConstruction(GameConstructionEvent event){
         startTimer(event.getState());
-        sendGameStageEmbed("Pre-Initializing Game Instance", 1);
+        sendGameStageEmbed("Constructing Game Instance", 1);
     }
 
     @Listener(order = Order.FIRST)
