@@ -1,7 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord.notify;
 
 import net.dirtcraft.discord.discordlink.API.GameChat;
-import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
@@ -9,7 +8,6 @@ import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Member;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 

@@ -17,7 +17,7 @@ public class IngameCommand implements DiscordCommandExecutor {
     }
     @Override
     public void execute(MessageSource source, String command, List<String> args) {
-        PrivateSender sender = new PrivateSender(source, command);
+        PrivateSender sender = new PrivateSender(source, this.command);
         Task.builder()
                 .execute( () -> Sponge.getCommandManager().process(sender, this.command))
                 .submit(DiscordLink.getInstance());

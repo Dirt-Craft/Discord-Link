@@ -28,13 +28,13 @@ public class PluginConfiguration {
     public static class Main {
 
         @Setting(value = "Silent-Console-Prefix", comment = "Prefix to use private console command")
-        public static String silentConsolePrefix = "#/";
+        public static String consolePrivate = "#/";
 
         @Setting(value = "Console-Prefix", comment = "Prefix to use console command")
-        public static String consolePrefix = "/";
+        public static String consolePublic = "/";
 
         @Setting(value = "Bot-Prefix", comment = "Prefix to use bot commands")
-        public static String botPrefix = "!";
+        public static String discordCommand = "!";
 
         @Setting(value = "Discord-Server-ID")
         public static String discordServerID = "269639757351354368";

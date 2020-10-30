@@ -11,11 +11,11 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.state.*;
 
 import java.awt.*;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Notifier.*;
+import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Notifier.maxStageMinutes;
+import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Notifier.notify;
 
 public class ServerBootHandler {
     private final long second = 1000;

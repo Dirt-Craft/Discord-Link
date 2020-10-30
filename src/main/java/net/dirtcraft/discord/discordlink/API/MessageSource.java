@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class MessageSource extends GuildMember {
     private final Message message;
     public MessageSource(MessageReceivedEvent event){
-        super(event.getMember());
+        super(GameChat.getGuild().retrieveMember(event.getAuthor()).complete());
         this.message = event.getMessage();
     }
 

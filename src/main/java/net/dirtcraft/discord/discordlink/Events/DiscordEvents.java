@@ -1,13 +1,12 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.API.ActionType;
-import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.Action;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -30,33 +29,46 @@ import static net.dirtcraft.discord.discordlink.Utility.Utility.*;
 
 public class DiscordEvents extends ListenerAdapter {
 
-    private final DiscordCommandManager commandManager;
-
-    public DiscordEvents(DiscordCommandManager commandManager) {
-        this.commandManager = commandManager;
-    }
+    private final DiscordCommandManager commandManager = new DiscordCommandManager();
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        net.dv8tion.jda.api.entities.User author = event.getAuthor();
+        boolean fake = author.isFake();
+        boolean bot = author.isBot();
         try {
-            if (!event.getChannel().equals(GameChat.getChannel())) return;
-            if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
-            if (hasAttachment(event)) return;
-
-            final MessageSource sender = new MessageSource(event);
-            final boolean started = Sponge.getGame().getState() == GameState.SERVER_STARTED;
-            final String message = event.getMessage().getContentDisplay();
-            final String rawMessage = event.getMessage().getContentRaw();
-            final ActionType action = ActionType.fromMessageRaw(rawMessage);
-
-
-            if (action == ActionType.CHAT && started) discordToMCAsync(sender, message);
-            else if (action == ActionType.DISCORD) commandManager.process(sender, action.getCommand(event));
-            else if (!action.proxy && started) toConsole(event, sender, action);
+            if (fake || bot) return;
+            if (event.getChannelType() == ChannelType.PRIVATE) processPrivateMessage(event);
+            else processGuildMessage(event);
         } catch (Exception e){
             Utility.dmExceptionAsync(e, 248056002274918400L);
             throw e;
         }
+    }
+
+    public void processGuildMessage(MessageReceivedEvent event) {
+        if (hasAttachment(event)) return;
+        final MessageSource sender = new MessageSource(event);
+        final boolean ready = Sponge.getGame().getState() == GameState.SERVER_STARTED;
+        final String message = event.getMessage().getContentDisplay();
+        final String rawMessage = event.getMessage().getContentRaw();
+        final Action intent = Action.fromMessageRaw(rawMessage);
+
+        if (intent.isChat() && ready) discordToMCAsync(sender, message);
+        else if (intent.isBotCommand()) commandManager.process(sender, intent.getCommand(event));
+        else if (intent.isConsole() && ready) {
+            boolean executed = toConsole(intent.getCommand(event), sender, intent);
+            if (executed && intent.isPrivate()) Utility.logCommand(sender, "__Executed Private Command__");
+            event.getMessage().delete().queue();
+        }
+    }
+
+    public void processPrivateMessage(MessageReceivedEvent event) {
+        if (Sponge.getGame().getState() != GameState.SERVER_STARTED) return;
+        final MessageSource sender = new MessageSource(event);
+        final Action intent = Action.PRIVATE_COMMAND;
+        final String message = Action.filterConsolePrefixes(event.getMessage().getContentRaw());
+        if (toConsole(message, sender, intent)) logCommand(sender, "__Executed Private Command via DM__");
     }
 
     private static void discordToMCAsync(MessageSource sender, String message){
@@ -73,8 +85,7 @@ public class DiscordEvents extends ListenerAdapter {
             final Text.Builder toBroadcast = Text.builder();
             final String username;
 
-            if (sender.isStaff() || mcUsername == null)
-                username = sender.getHighestRank().getStyle() + sender.getEffectiveName().replaceAll(STRIP_CODE_REGEX, "");
+            if (sender.isStaff() || mcUsername == null) username = sender.getHighestRank().getStyle() + sender.getEffectiveName().replaceAll(STRIP_CODE_REGEX, "");
             else username = sender.getNameStyle() + mcUsername;
 
 
@@ -147,13 +158,10 @@ public class DiscordEvents extends ListenerAdapter {
     }
 
     private boolean hasAttachment(MessageReceivedEvent event) {
-        boolean hasAttachment = false;
-        for (Message.Attachment attachment : event.getMessage().getAttachments()) {
-            if (attachment != null) {
-                hasAttachment = true;
-            }
+        for (net.dv8tion.jda.api.entities.Message.Attachment attachment : event.getMessage().getAttachments()) {
+            if (attachment != null) return true;
         }
-        return hasAttachment;
+        return false;
     }
 
 }

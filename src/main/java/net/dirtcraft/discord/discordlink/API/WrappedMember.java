@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.Game;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
