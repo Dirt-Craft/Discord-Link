@@ -117,6 +117,10 @@ public class DiscordLink extends ServerBootHandler {
         return storage;
     }
 
+    public Logger getLogger(){
+        return logger;
+    }
+
     public static DiscordLink getInstance() {
         return instance;
     }

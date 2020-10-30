@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
@@ -25,6 +24,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import static net.dirtcraft.discord.discordlink.Utility.Utility.*;
 
@@ -35,30 +35,27 @@ public class DiscordEvents extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        net.dv8tion.jda.api.entities.User author = event.getAuthor();
-        boolean fake = author.isFake();
-        boolean bot = author.isBot();
-        try {
-            if (fake || bot) return;
-            if (event.getChannelType() == ChannelType.PRIVATE) processPrivateMessage(event);
-            else if (GameChat.isGamechat(event.getChannel())) processGuildMessage(event);
-        } catch (Exception e){
-            Utility.dmExceptionAsync(e, 248056002274918400L);
-            throw e;
-        }
+        CompletableFuture.runAsync(()->{
+            try {
+                if (event.getChannelType() == ChannelType.PRIVATE) processPrivateMessage(event);
+                else if (GameChat.isGamechat(event.getChannel())) processGuildMessage(event);
+            } catch (Exception e){
+                DiscordLink.getInstance().getLogger().warn("Exception while processing gamechat message!", e);
+                Utility.dmExceptionAsync(e, 248056002274918400L);
+            }
+        });
     }
 
     public void processGuildMessage(MessageReceivedEvent event) {
-        if (hasAttachment(event)) return;
+        if (event.getAuthor().isBot() || hasAttachment(event)) return;
         final MessageSource sender = new MessageSource(event);
-        final boolean ready = Sponge.getGame().getState() == GameState.SERVER_STARTED;
         final String message = event.getMessage().getContentDisplay();
         final String rawMessage = event.getMessage().getContentRaw();
         final Action intent = Action.fromMessageRaw(rawMessage);
 
-        if (intent.isChat() && ready) discordToMCAsync(sender, message);
+        if (intent.isChat() && isReady()) discordToMCAsync(sender, message);
         else if (intent.isBotCommand()) commandManager.process(sender, intent.getCommand(event));
-        else if (intent.isConsole() && ready) {
+        else if (intent.isConsole() && isReady()) {
             boolean executed = toConsole(intent.getCommand(event), sender, intent);
             if (executed && intent.isPrivate()) Utility.logCommand(sender, "__Executed Private Command__");
             event.getMessage().delete().queue(s->{},e->{});
@@ -66,7 +63,7 @@ public class DiscordEvents extends ListenerAdapter {
     }
 
     public void processPrivateMessage(MessageReceivedEvent event) {
-        if (Sponge.getGame().getState() != GameState.SERVER_STARTED) return;
+        if (!isReady() || event.getAuthor().isBot()) return;
         final MessageSource sender = new MessageSource(event);
         final Action intent = Action.PRIVATE_COMMAND;
         final String message = Action.filterConsolePrefixes(event.getMessage().getContentRaw());
@@ -164,6 +161,10 @@ public class DiscordEvents extends ListenerAdapter {
             if (attachment != null) return true;
         }
         return false;
+    }
+
+    private boolean isReady(){
+        return Sponge.getGame().getState() != GameState.SERVER_STARTED;
     }
 
 }

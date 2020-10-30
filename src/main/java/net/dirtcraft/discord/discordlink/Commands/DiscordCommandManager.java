@@ -82,7 +82,7 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .build();
 
         DiscordCommand notify = DiscordCommand.builder()
-                .setDescription("Manages notification settings.")
+                .setDescription("Shows server-boot notifier commands")
                 .setPreBootEnabled(true)
                 .setCommandExecutor(new NotifyBase())
                 .build();
