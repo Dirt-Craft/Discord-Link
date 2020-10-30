@@ -20,7 +20,7 @@ public class StopServer implements DiscordCommandExecutor {
         try {
             GameChat.sendEmbed("Discord-Link Reboot", "Attempting to reboot the server.");
             source.getMessage().delete().queue(s->{},e->{});
-            Thread.sleep(333);
+            Thread.sleep(555);
         } catch (Throwable ignored){
 
         } finally {

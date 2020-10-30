@@ -164,7 +164,7 @@ public class DiscordEvents extends ListenerAdapter {
     }
 
     private boolean isReady(){
-        return Sponge.getGame().getState() != GameState.SERVER_STARTED;
+        return Sponge.getGame().getState() == GameState.SERVER_STARTED;
     }
 
 }
