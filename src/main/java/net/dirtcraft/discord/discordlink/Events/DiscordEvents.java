@@ -61,7 +61,7 @@ public class DiscordEvents extends ListenerAdapter {
         else if (intent.isConsole() && ready) {
             boolean executed = toConsole(intent.getCommand(event), sender, intent);
             if (executed && intent.isPrivate()) Utility.logCommand(sender, "__Executed Private Command__");
-            event.getMessage().delete().queue();
+            event.getMessage().delete().queue(s->{},e->{});
         }
     }
 

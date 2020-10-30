@@ -6,6 +6,8 @@ import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordPermissionException;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
+import org.spongepowered.api.GameState;
+import org.spongepowered.api.Sponge;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +16,15 @@ public class DiscordCommand {
     private final List<Roles> allowedRoles;
     private final String description;
     private final DiscordCommandExecutor executor;
+    private final String commandUsage;
+    private final boolean preBoot;
 
-    private DiscordCommand(List<Roles> allowed, DiscordCommandExecutor executor, String description){
+    private DiscordCommand(List<Roles> allowed, DiscordCommandExecutor executor, String commandUsage, String description, boolean preBoot){
         this.allowedRoles = allowed;
         this.executor = executor;
+        this.commandUsage = commandUsage;
         this.description = description;
+        this.preBoot = preBoot;
     }
 
     public boolean hasPermission(GuildMember member){
@@ -30,6 +36,7 @@ public class DiscordCommand {
     }
 
     public final void process(MessageSource member, String command, List<String> args) {
+        if (Sponge.getGame().getState() != GameState.SERVER_STARTED && !preBoot) return;
         if (!allowedRoles.stream().allMatch(member::hasRole)) {
             Utility.sendPermissionError(member);
             return;
@@ -48,10 +55,16 @@ public class DiscordCommand {
         return description;
     }
 
+    public String getUsage() {
+        return commandUsage;
+    }
+
     public static class Builder{
         private List<Roles> allowedRoles;
         private DiscordCommandExecutor executor;
+        private String commandUsage;
         private String description;
+        private boolean preBootCommand;
 
         private Builder(){}
 
@@ -70,11 +83,23 @@ public class DiscordCommand {
             return this;
         }
 
+        public final Builder setCommandUsage(String commandUsage){
+            this.commandUsage = commandUsage;
+            return this;
+        }
+
+        public final Builder setPreBootEnabled(boolean b){
+            this.preBootCommand = b;
+            return this;
+        }
+
         public DiscordCommand build(){
             return new DiscordCommand(
                     allowedRoles != null ? allowedRoles : new ArrayList<>(),
                     executor     != null ? executor     : (member, command, event)->{},
-                    description  != null ? description  : ""
+                    commandUsage != null ? commandUsage : "",
+                    description  != null ? description  : "",
+                    preBootCommand
             );
         }
 

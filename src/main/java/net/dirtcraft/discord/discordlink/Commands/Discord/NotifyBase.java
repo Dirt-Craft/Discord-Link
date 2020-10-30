@@ -18,24 +18,29 @@ public class NotifyBase extends DiscordCommandTree {
     public NotifyBase(){
         DiscordCommand time = DiscordCommand.builder()
                 .setDescription("Sets when the boot failure threshold is reached, In minutes")
+                .setPreBootEnabled(true)
                 .setRequiredRoles(Roles.DIRTY)
+                .setCommandUsage("[<number>]")
                 .setCommandExecutor(new Time())
                 .build();
 
         DiscordCommand add = DiscordCommand.builder()
                 .setDescription("Starts notifying you when the boot failure threshold is reached.")
+                .setPreBootEnabled(true)
                 .setRequiredRoles(Roles.ADMIN)
                 .setCommandExecutor(new Add())
                 .build();
 
         DiscordCommand list = DiscordCommand.builder()
                 .setDescription("List anyone to be notified when the boot failure threshold is reached.")
+                .setPreBootEnabled(true)
                 .setRequiredRoles(Roles.ADMIN)
                 .setCommandExecutor(new List())
                 .build();
 
         DiscordCommand remove = DiscordCommand.builder()
                 .setDescription("Stops notifying you when the boot failure threshold is reached.")
+                .setPreBootEnabled(true)
                 .setRequiredRoles(Roles.VERIFIED)
                 .setCommandExecutor(new Remove())
                 .build();
@@ -52,7 +57,7 @@ public class NotifyBase extends DiscordCommandTree {
         String pre = PluginConfiguration.Main.discordCommand;
         getCommandMap().forEach((alias, cmd)->{
             if (!cmd.hasPermission(member)) return;
-            String header = pre + command + " " + alias;
+            String header = pre + command + " " + alias + " " + cmd.getUsage();
             embed.addField(header, cmd.getDescription(), false);
         });
         GameChat.sendMessage(embed.build(), 30);

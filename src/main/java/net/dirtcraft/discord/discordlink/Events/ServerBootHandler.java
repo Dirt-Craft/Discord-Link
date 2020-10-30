@@ -26,7 +26,7 @@ public class ServerBootHandler {
 
     private CompletableFuture<Message> future;
 
-    public ServerBootHandler(GameConstructionEvent event){
+    public void onGameConstruction(GameConstructionEvent event){
         startTimer(event.getState());
         sendGameStageEmbed("Pre-Initializing Game Instance", 1);
     }

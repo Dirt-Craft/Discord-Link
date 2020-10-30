@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.JDA;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
+import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
@@ -39,7 +40,7 @@ import org.spongepowered.api.text.Text;
                 @Dependency(id = "dirt-database-lib", optional = true)
         }
 )
-public class DiscordLink {
+public class DiscordLink extends ServerBootHandler {
     private static DiscordLink instance;
     private static JDA jda;
 
@@ -50,8 +51,9 @@ public class DiscordLink {
     private ConfigManager configManager;
     private Storage storage;
 
+    @Override
     @Listener (order = Order.AFTER_PRE)
-    public void onPreInit(GameConstructionEvent event) {
+    public void onGameConstruction(GameConstructionEvent event) {
         logger.info("Discord Link initializing...");
         if (!Sponge.getPluginManager().isLoaded("sponge-discord-lib")) {
             logger.error("Sponge-Discord-Lib is not installed! " + container.getName() + " will not load.");
@@ -70,7 +72,7 @@ public class DiscordLink {
         instance = this;
 
         getJDA().addEventListener(new DiscordEvents());
-        Sponge.getEventManager().registerListeners(instance, new ServerBootHandler(event));
+        super.onGameConstruction(event);
         logger.info("Discord Link initialized");
     }
 
@@ -119,6 +121,12 @@ public class DiscordLink {
 
     public static JDA getJDA() {
         return jda;
+    }
+
+    private static boolean isReady(){
+        return instance != null &&
+               jda != null &&
+               Sponge.getGame().getState() == GameState.SERVER_STARTED;
     }
 
 }
