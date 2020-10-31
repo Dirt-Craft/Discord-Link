@@ -35,9 +35,9 @@ import org.spongepowered.api.text.Text;
                 "ShinyAfro"
         },
         dependencies = {
-                @Dependency(id = "sponge-discord-lib", optional = true),
                 @Dependency(id = "ultimatechat", optional = true),
-                @Dependency(id = "dirt-database-lib", optional = true)
+                @Dependency(id = "sponge-discord-lib"),
+                @Dependency(id = "dirt-database-lib")
         }
 )
 public class DiscordLink extends ServerBootHandler {
@@ -57,14 +57,17 @@ public class DiscordLink extends ServerBootHandler {
         logger.info("Discord Link initializing...");
         if (!Sponge.getPluginManager().isLoaded("sponge-discord-lib")) {
             logger.error("Sponge-Discord-Lib is not installed! " + container.getName() + " will not load.");
+            Sponge.getEventManager().unregisterListeners(this);
             return;
         }
         if (!Sponge.getPluginManager().isLoaded("dirt-database-lib")) {
             logger.error("Dirt-Database-Lib is not installed! " + container.getName() + " will not load.");
+            Sponge.getEventManager().unregisterListeners(this);
             return;
         }
         if ((jda = SpongeDiscordLib.getJDA()) == null) {
             logger.error("JDA failed to connect to discord gateway! " + container.getName() + " will not load.");
+            Sponge.getEventManager().unregisterListeners(this);
             return;
         }
         this.configManager = new ConfigManager(loader);
@@ -80,7 +83,6 @@ public class DiscordLink extends ServerBootHandler {
     @Listener(order = Order.PRE)
     public void onGameInitialization(GameInitializationEvent event) {
         super.onGameInitialization(event);
-        if (instance == null) return;
         Sponge.getEventManager().registerListeners(instance, new SpongeEvents(instance, storage));
         this.registerCommands();
         Utility.setStatus();
