@@ -5,18 +5,19 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import javax.annotation.Nullable;
 
-import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Roles.*;
+import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Roles.*;
 
 public enum Roles {
-    OWNER   (ownerRoleID,   true, 'c',"Owner"           ),
-    DIRTY   (dirtyRoleID,   true, 'e',"Manager"         ),
-    ADMIN   (adminRoleID,   true, '4',"Admin"           ),
-    MOD     (modRoleID  ,   true, 'b',"Moderator"       ),
-    STAFF   (staffRoleID,   true, '5',"Helper"          ),
-    NITRO   (nitroRoleID,   false,'a',"Nitro Booster"   ),
-    DONOR   (donatorRoleID, false,'6',"Donor"           ),
-    VERIFIED(verifiedRoleID,false,'7',"Verified"        ),
-    NONE    (null,      false,'7',"None"            );
+    OWNER   (ownerRoleID,    true, 'c',"Owner"           ),
+    DIRTY   (dirtyRoleID,    true, 'e',"Manager"         ),
+    ADMIN   (adminRoleID,    true, '4',"Admin"           ),
+    MOD     (moderatorRoleID,true, 'b',"Moderator"       ),
+    HELPER  (helperRoleID,   true, '5',"Helper"          ),
+    STAFF   (staffRoleID,    true, 'd',"Staff"           ),
+    NITRO   (nitroRoleID,    false,'a',"Nitro Booster"   ),
+    DONOR   (donatorRoleID,  false,'6',"Donor"           ),
+    VERIFIED(verifiedRoleID, false,'7',"Verified"        ),
+    NONE    (null,       false,'7',"None"            );
 
     private final long id;
     private final String name;
@@ -31,7 +32,7 @@ public enum Roles {
     }
 
     @Nullable public Role getRole(){
-        return GameChat.getGuild().getRoleById(id);
+        return Channels.getGuild().getRoleById(id);
     }
 
     @NonNull public String getName(){

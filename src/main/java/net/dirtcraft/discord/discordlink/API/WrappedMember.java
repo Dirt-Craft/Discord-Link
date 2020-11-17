@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -21,13 +20,13 @@ public class WrappedMember implements Member {
         this.member = member;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public User getUser() {
         return member.getUser();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public Guild getGuild() {
         return member.getGuild();
@@ -58,12 +57,12 @@ public class WrappedMember implements Member {
     }
 
     @Override
-    public boolean hasPermission(@NotNull Permission... permissions) {
+    public boolean hasPermission(@Nonnull Permission... permissions) {
         return member.hasPermission(permissions);
     }
 
     @Override
-    public boolean hasPermission(@NotNull Collection<Permission> permissions) {
+    public boolean hasPermission(@Nonnull Collection<Permission> permissions) {
         return member.hasPermission(permissions);
     }
 
@@ -110,7 +109,7 @@ public class WrappedMember implements Member {
         return member.getActivities();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public OnlineStatus getOnlineStatus() {
         return member.getOnlineStatus();
@@ -133,7 +132,7 @@ public class WrappedMember implements Member {
         return member.getNickname();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getEffectiveName() {
         return member.getEffectiveName();
@@ -156,17 +155,17 @@ public class WrappedMember implements Member {
     }
 
     @Override
-    public boolean canInteract(@NotNull Member member) {
+    public boolean canInteract(@Nonnull Member member) {
         return this.member.canInteract(member);
     }
 
     @Override
-    public boolean canInteract(@NotNull Role role) {
+    public boolean canInteract(@Nonnull Role role) {
         return member.canInteract(role);
     }
 
     @Override
-    public boolean canInteract(@NotNull Emote emote) {
+    public boolean canInteract(@Nonnull Emote emote) {
         return member.canInteract(emote);
     }
 
@@ -176,7 +175,7 @@ public class WrappedMember implements Member {
         return member.getDefaultChannel();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getAsMention() {
         return member.getAsMention();

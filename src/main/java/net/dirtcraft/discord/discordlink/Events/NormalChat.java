@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -25,7 +25,7 @@ public class NormalChat {
         String username = player.getName();
         String message = TextSerializers.FORMATTING_CODE.stripCodes(Utility.sanitiseMinecraftText(event.getRawMessage().toPlain()));
 
-        GameChat.sendPlayerMessage(prefix, username, message);
+        Channels.sendPlayerMessage(prefix, username, message);
     }
 
     private void notify(Text msg){

@@ -1,15 +1,13 @@
 package net.dirtcraft.discord.discordlink.API;
 
-
-import net.dirtcraft.discord.discordlink.Commands.Sources.GamechatSender;
-import net.dirtcraft.discord.discordlink.Commands.Sources.PrivateSender;
-import net.dirtcraft.discord.discordlink.Commands.Sources.WrappedConsole;
+import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
+import net.dirtcraft.discord.discordlink.Commands.Sources.DiscordResponder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Main.*;
+import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Main.*;
 
 public enum Action {
     CHAT            ( "\n",    Sender.NONE,     Type.CHAT_MESSAGE),
@@ -60,11 +58,11 @@ public enum Action {
         return prefix;
     }
 
-    public WrappedConsole getSender(GuildMember sender, String command){
+    public ConsoleSource getCommandSource(Channel chat, MessageSource sender, String command){
         if (this.sender == Sender.PRIVATE) {
-            return new PrivateSender(sender, command);
+            return DiscordResponder.getSender(sender);
         } else {
-            return new GamechatSender(sender, command);
+            return DiscordResponder.getSender(chat.getCommandResponder(sender, command));
         }
     }
 

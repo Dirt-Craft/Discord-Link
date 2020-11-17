@@ -1,4 +1,4 @@
-package net.dirtcraft.discord.discordlink.Database;
+package net.dirtcraft.discord.discordlink.Storage;
 
 import net.dirtcraft.plugin.dirtdatabaselib.DirtDatabaseLib;
 
@@ -7,9 +7,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.UUID;
 
-public class Storage {
+public class Database {
 
     public boolean isVerified(UUID uuid) {
         boolean result;
@@ -30,6 +31,20 @@ public class Storage {
         }
 
         return result;
+    }
+
+    public void createRecord(String discordID, String code) {
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement("INSERT INTO verification (discordid, code) VALUES (?, ?)")) {
+
+            ps.setString(1, discordID);
+            ps.setString(2, code);
+
+            ps.execute();
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
     }
 
     public boolean validCode(String code) {
@@ -162,7 +177,50 @@ public class Storage {
         }
     }
 
+    public Optional<VerificationData> getVerificationData(String discordID) {
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE discordid = ?")) {
+
+            ps.setString(1, discordID);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return Optional.empty();
+                String code = rs.getString("code");
+                String uuid = rs.getString("uuid");
+                String discordId = rs.getString("discordid");
+                return Optional.of(new VerificationData(uuid, discordId, code));
+            }
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
     private Connection getConnection() {
         return DirtDatabaseLib.getConnection("playerdata", null);
+    }
+
+    public static class VerificationData {
+        final UUID uuid;
+        final Long discordId;
+        final String code;
+        VerificationData(String uuid, String discord, String code){
+            this.discordId = discord == null? null : Long.parseLong(discord);
+            this.uuid = uuid == null? null : UUID.fromString(uuid);
+            this.code = code;
+        }
+
+        public Optional<UUID> getUUID(){
+            return Optional.ofNullable(uuid);
+        }
+
+        public Optional<Long> getDiscordId(){
+            return Optional.ofNullable(discordId);
+        }
+
+        public Optional<String> getCode(){
+            return Optional.ofNullable(code);
+        }
     }
 }

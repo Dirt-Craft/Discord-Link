@@ -1,5 +1,6 @@
-package net.dirtcraft.discord.discordlink.Configuration;
+package net.dirtcraft.discord.discordlink.Storage;
 
+import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
@@ -38,6 +39,12 @@ public class PluginConfiguration {
 
         @Setting(value = "Discord-Server-ID")
         public static String discordServerID = "269639757351354368";
+
+        @Setting(value = "Discord-Server-ID")
+        public static String gamechatChannelID = SpongeDiscordLib.getGamechatChannelID();
+
+        @Setting(value = "Discord-Server-ID")
+        public static String serverLogChannelID = "566095634008899585";
 
     }
 
@@ -91,7 +98,10 @@ public class PluginConfiguration {
         public static String adminRoleID = "531631265443479562";
 
         @Setting(value = "Moderator-Role-ID")
-        public static String modRoleID = "332701183477284867";
+        public static String moderatorRoleID = "332701183477284867";
+
+        @Setting(value = "Helper-Role-ID")
+        public static String helperRoleID = "563538434333999108";
 
         @Setting(value = "Staff-Role-ID")
         public static String staffRoleID = "549039481450397699";

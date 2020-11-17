@@ -1,8 +1,8 @@
 package net.dirtcraft.discord.discordlink.Commands.Sponge;
 
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
-import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Storage.Database;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.entities.Guild;
@@ -27,9 +27,9 @@ import java.net.URL;
 
 public class Verify implements CommandExecutor {
 
-    private final Storage storage;
+    private final Database storage;
 
-    public Verify(Storage storage) {
+    public Verify(Database storage) {
         this.storage = storage;
     }
 

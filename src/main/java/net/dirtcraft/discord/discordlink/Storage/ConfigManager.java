@@ -1,4 +1,4 @@
-package net.dirtcraft.discord.discordlink.Configuration;
+package net.dirtcraft.discord.discordlink.Storage;
 
 import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationOptions;

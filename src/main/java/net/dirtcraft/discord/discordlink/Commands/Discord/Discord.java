@@ -1,6 +1,5 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
@@ -30,6 +29,6 @@ public class Discord implements DiscordCommandExecutor {
         }
         Optional<GuildMember> optDiscordSource = GuildMember.fromPlayerId(optUser.getUniqueId());
         if (!optDiscordSource.isPresent()) throw new DiscordCommandException("User not verified.");
-        GameChat.sendEmbed(null, "\\" + optDiscordSource.get().getAsMention());
+        source.sendCommandResponse("Discord Username", "\\" + optDiscordSource.get().getAsMention());
     }
 }

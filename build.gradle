@@ -1,3 +1,4 @@
+import org.apache.tools.ant.filters.ReplaceTokens
 plugins {
     id 'org.spongepowered.plugin' version '0.8.1'
     id 'java'
@@ -9,7 +10,7 @@ version = pluginVersion
 repositories {
     jcenter()
     mavenCentral()
-    maven { url = "https://raw.github.com/FabioZumbi12/UltimateChat/mvn-repo/" }
+    maven { url 'https://raw.github.com/FabioZumbi12/UltimateChat/mvn-repo/' }
     maven { url 'https://jitpack.io' }
 }
 
@@ -22,6 +23,23 @@ dependencies {
     compile 'com.github.NucleusPowered:Nucleus:1.14.0'
     compile 'com.github.Dirt-Craft:Sponge-Discord-Lib:deploy-SNAPSHOT'
     compile 'com.github.Dirt-Craft:Dirt-Database-Lib:deploy-SNAPSHOT'
+}
+
+jar {
+    archiveName = "Discord-Link-1.0.0.jar"
+}
+
+task processSource(type: Sync) {
+    from sourceSets.main.java
+    inputs.properties(
+            version: version)
+    filter(ReplaceTokens, tokens: [
+            VERSION  : version])
+    into "$buildDir/src"
+}
+
+compileJava {
+    source = processSource.outputs
 }
 
 sponge.plugin.id = pluginId

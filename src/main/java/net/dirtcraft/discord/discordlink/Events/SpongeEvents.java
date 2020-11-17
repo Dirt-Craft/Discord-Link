@@ -1,9 +1,10 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
-import net.dirtcraft.discord.discordlink.Database.Storage;
+import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Storage.Database;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -21,9 +22,9 @@ import java.awt.*;
 public class SpongeEvents {
 
     private final DiscordLink main;
-    private final Storage storage;
+    private final Database storage;
 
-    public SpongeEvents(DiscordLink main, Storage storage) {
+    public SpongeEvents(DiscordLink main, Database storage) {
         this.main = main;
         this.storage = storage;
     }
@@ -32,7 +33,7 @@ public class SpongeEvents {
 
     @Listener
     public void onServerStarted(GameStartedServerEvent event) {
-        GameChat.sendMessage(
+        Channels.getDefaultChat().sendMessage(
                 Utility.embedBuilder()
                 .setColor(Color.GREEN)
                 .setDescription(PluginConfiguration.Format.serverStart
@@ -42,7 +43,7 @@ public class SpongeEvents {
 
     @Listener
     public void onServerStopping(GameStoppingServerEvent event) {
-        GameChat.sendMessage(
+        Channels.getDefaultChat().sendMessage(
                 Utility.embedBuilder()
                         .setDescription(PluginConfiguration.Format.serverStop
                                 .replace("{modpack}", modpack)
@@ -51,11 +52,12 @@ public class SpongeEvents {
 
     @Listener
     public void onPlayerJoin(ClientConnectionEvent.Join event, @Root Player player) {
+        Utility.setRoles(PlatformUtils.getPlayer(player));
         if (player.get(Keys.VANISH).orElse(false)) return;
         if (player.hasPlayedBefore()) {
-            String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(""));
+            String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(PlatformUtils.getPlayer(player).getPrefix().orElse("")));
 
-            GameChat.sendMessage(PluginConfiguration.Format.playerJoin
+            Channels.getDefaultChat().sendMessage(PluginConfiguration.Format.playerJoin
                     .replace("{username}", player.getName())
                     .replace("{prefix}", prefix)
             );
@@ -66,7 +68,7 @@ public class SpongeEvents {
                             .replace("{username}", player.getName()))
                     .build();
 
-            GameChat.sendMessage(embed);
+            Channels.getDefaultChat().sendMessage(embed);
         }
     }
 
@@ -75,7 +77,7 @@ public class SpongeEvents {
         if (player.get(Keys.VANISH).orElse(false)) return;
         String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(""));
 
-        GameChat.sendMessage(PluginConfiguration.Format.playerDisconnect
+        Channels.getDefaultChat().sendMessage(PluginConfiguration.Format.playerDisconnect
                         .replace("{username}", player.getName())
                         .replace("{prefix}", prefix)
                 );
