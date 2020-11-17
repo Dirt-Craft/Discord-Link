@@ -1,8 +1,8 @@
 package net.dirtcraft.discord.discordlink.Commands.Sponge;
 
-import javafx.util.Pair;
 import net.dirtcraft.discord.discordlink.Storage.Permission;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
+import net.dirtcraft.discord.discordlink.Utility.Pair;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
