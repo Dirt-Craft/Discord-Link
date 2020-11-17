@@ -23,6 +23,8 @@ public abstract class PermissionUtils {
 
     public abstract void setPlayerPrefix(User target, String prefix);
 
+    public abstract void clearPlayerPrefix(User target);
+
     public abstract Optional<String> getPrefix(UUID uuid);
 
     public abstract Optional<RankUpdate> modifyRank(@Nullable Player source, @Nullable UUID targetUUID, @Nullable String trackName, boolean promote);

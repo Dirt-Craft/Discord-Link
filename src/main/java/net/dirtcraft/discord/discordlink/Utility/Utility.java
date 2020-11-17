@@ -96,26 +96,38 @@ public class Utility {
     }
 
     public static void setRoles(PlatformPlayer player){
-        CompletableFuture.runAsync(()->{
-            Optional<GuildMember> optPlayer = GuildMember.fromPlayerId(player.getUUID());
-            if (!optPlayer.isPresent()) return;
-            GuildMember member = optPlayer.get();
-            Guild guild = Channels.getGuild();
+        CompletableFuture.runAsync(()-> GuildMember.fromPlayerId(player.getUUID())
+                .ifPresent(member->setRoles(player, member)));
+    }
 
-            if (player.hasPermission(Permission.ROLES_MANAGER)) setRoleIfAbsent(guild, member, Roles.DIRTY);
-            else if (player.hasPermission(Permission.ROLES_ADMIN)) setRoleIfAbsent(guild, member, Roles.ADMIN);
-            else if (player.hasPermission(Permission.ROLES_MODERATOR)) setRoleIfAbsent(guild, member, Roles.MOD);
-            else if (player.hasPermission(Permission.ROLES_HELPER)) setRoleIfAbsent(guild, member, Roles.HELPER);
-            if (player.hasPermission(Permission.ROLES_STAFF)) setRoleIfAbsent(guild, member, Roles.STAFF);
-            if (player.hasPermission(Permission.ROLES_DONOR)) setRoleIfAbsent(guild, member, Roles.DONOR);
-            setRoleIfAbsent(guild, member, Roles.VERIFIED);
-        });
+    public static void setRoles(PlatformPlayer player, GuildMember member) {
+        Guild guild = Channels.getGuild();
+        if (player.hasPermission(Permission.ROLES_DONOR)) setRoleIfAbsent(guild, member, Roles.DONOR);
+        if (!member.getRoles().contains(Roles.STAFF.getRole())) tryChangeNickname(guild, member, player.getName());
+        setRoleIfAbsent(guild, member, Roles.VERIFIED);
     }
 
     public static void setRoleIfAbsent(Guild guild, GuildMember member, Roles role){
-        Role discordRole = role.getRole();
-        if (discordRole == null || member.hasRole(role)) return;
-        guild.addRoleToMember(member, discordRole).submit();
+        try {
+            Role discordRole = role.getRole();
+            if (discordRole == null || member.hasRole(role)) return;
+            guild.addRoleToMember(member, discordRole).submit();
+        } catch (Exception ignored){}
+    }
+
+    public static void removeRoleIfPresent(Guild guild, GuildMember member, Roles role){
+        try {
+            Role discordRole = role.getRole();
+            if (discordRole == null || !member.hasRole(role)) return;
+            guild.removeRoleFromMember(member, discordRole).submit();
+        } catch (Exception ignored){}
+    }
+
+    public static void tryChangeNickname(Guild guild, GuildMember member, String name){
+        try {
+            if (name == null) return;
+            guild.modifyNickname(member, name).submit();
+        } catch (Exception ignored){ }
     }
 
     public static void setStatus() {

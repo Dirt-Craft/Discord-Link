@@ -23,7 +23,12 @@ public class DefaultProvider extends PermissionUtils {
 
     @Override
     public void setPlayerPrefix(User target, String prefix) {
-        
+
+    }
+
+    @Override
+    public void clearPlayerPrefix(User target) {
+
     }
 
     @Override

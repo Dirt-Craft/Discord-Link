@@ -33,9 +33,12 @@ public class Prefix implements DiscordCommandExecutor {
                 .map(PlatformUser::getUser)
                 .map(u->getTarget(u, args).orElse(u))
                 .orElseThrow(()->new DiscordCommandException("No player present for Discord User."));
-        if (args.isEmpty()) throw new DiscordCommandException("You must specify a prefix");
         String arrow = getChevron(target, args);
         String color = getColor(args);
+        if (args.isEmpty()) throw new DiscordCommandException("You must specify a prefix");
+        else if (args.size() == 1 && args.get(0).equalsIgnoreCase("none")){
+            PermissionUtils.INSTANCE.clearPlayerPrefix(target);
+        }
         String rankPrefix = staffPrefixMap.entrySet().stream()
                 .filter(p->target.hasPermission(p.getKey()))
                 .map(Map.Entry::getValue)

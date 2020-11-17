@@ -2,7 +2,6 @@ package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.LuckP
 
 
 import net.dirtcraft.discord.discordlink.API.MessageSource;
-import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.context.ImmutableContextSet;

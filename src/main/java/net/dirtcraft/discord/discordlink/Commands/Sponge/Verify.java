@@ -1,15 +1,10 @@
 package net.dirtcraft.discord.discordlink.Commands.Sponge;
 
+import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
-import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
-import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.exceptions.HierarchyException;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -17,13 +12,13 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 
 public class Verify implements CommandExecutor {
 
@@ -33,120 +28,76 @@ public class Verify implements CommandExecutor {
         this.storage = storage;
     }
 
+    @Nonnull
     @Override
-    public CommandResult execute(CommandSource source, CommandContext args) throws CommandException {
+    public CommandResult execute(@Nonnull CommandSource source, @Nonnull CommandContext args) throws CommandException {
         if (!(source instanceof Player)) throw new CommandException(Utility.format("&cOnly a player can verify their Discord account!"));
+        Optional<String> code = args.getOne("code");
         Player player = (Player) source;
+        Task.builder()
+                .async()
+                .execute(code.<Runnable>map(s -> () -> verify(player, s)).orElse(() -> usage(player)))
+                .submit(DiscordLink.getInstance());
+        return CommandResult.success();
+    }
 
-        if (args.<String>getOne("code").isPresent()) {
-            String code = args.<String>getOne("code").get();
-            Task.builder()
-                    .async()
-                    .execute(() -> {
-                        if (storage.isVerified(player.getUniqueId())) {
-                            String playerId = storage.getDiscordUser(player.getUniqueId());
-                            User user = playerId == null? null: SpongeDiscordLib.getJDA().retrieveUserById(playerId).complete();
+    private void verify(Player player, String code) {
+        Optional<Database.VerificationData> optData = storage.getVerificationData(player.getUniqueId());
+        if (optData.isPresent() && !optData.flatMap(Database.VerificationData::getMember).isPresent()){
+            String invite = "&cYour Discord account has already been verified, but it is not in the DirtCraft Discord!";
+            invite += "\n&5&nClick Me&7 to &ajoin &7it";
+            sendDiscordInvite(player, invite);
+            return;
+        } else if (optData.isPresent()) {
+            sendAlreadyVerifiedError(player, optData);
+            return;
+        } else if (!(optData = storage.getPendingData(code)).isPresent()) {
+            player.sendMessage(Utility.format("&cThe code &e" + code + "&c is not valid!"));
+            return;
+        }
 
-                            player.sendMessage(Utility.format(user != null ?
-                                    "&cYour account is already verified with &6" + user.getName() + "&8#&7" + user.getDiscriminator() + "&c!" :
-                                    "&cYour account is already verified!"));
-                            return;
-                        }
-                        if (!storage.validCode(code)) {
-                            player.sendMessage(Utility.format("&cThe code &e" + code + "&c is not valid!"));
-                            return;
-                        }
-
-                        storage.updateRecord(code, player.getUniqueId());
-
-                        String discordID = storage.getDiscordUser(player.getUniqueId());
-
-                        if (discordID == null) {
-                            player.sendMessage(Utility.format("&cCould not verify your Discord account, please contact an Administrator!"));
-                            return;
-                        }
-
-                        @Nullable
-                        User user = SpongeDiscordLib.getJDA().retrieveUserById(discordID).complete();
-
-                        if (user == null) {
-                            Text.Builder discordJoin = Text.builder();
-                            discordJoin.append(Utility.format("&cYour Discord account has been verified, but it is not in the DirtCraft Discord!\n&5&nClick Me&7 to &ajoin &7it"));
-                            try {
-                                discordJoin.onHover(TextActions.showText(Utility.format("&6Click me to join the DirtCraft Discord")));
-                                discordJoin.onClick(TextActions.openUrl(new URL("http://discord.dirtcraft.gg/")));
-                            } catch (MalformedURLException exception) {
-                                discordJoin.onHover(TextActions.showText(Utility.format("&cMalformed URL, contact Administrator")));
-                            }
-
-                            player.sendMessage(discordJoin.build());
-                            return;
-                        }
-
-                        String discordName = user.getName();
-                        String discordTag = user.getDiscriminator();
-
-                        player.sendMessage(Utility.format("&7Successfully verified &6" + player.getName() + "&7 with &6" + discordName + "&8#&7" + discordTag));
-
-                        Guild guild = SpongeDiscordLib.getJDA().getGuildById(PluginConfiguration.Main.discordServerID);
-                        Member member = Utility.getMember(user).orElse(null);
-                        if (guild == null || member == null) return;
-
-                        Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);
-                        Role staffRole = guild.getRoleById(PluginConfiguration.Roles.staffRoleID);
-                        Role donorRole = guild.getRoleById(PluginConfiguration.Roles.donatorRoleID);
-
-
-                        if (verifiedRole != null && !member.getRoles().contains(verifiedRole)) {
-                            guild.addRoleToMember(member, verifiedRole).queue();
-                        }
-                        if (donorRole != null && player.hasPermission("discordlink.donator") && !member.getRoles().contains(donorRole)) {
-                            guild.addRoleToMember(member, donorRole).queue();
-                        }
-                        if (!member.getRoles().contains(staffRole)) {
-                            try {
-                                guild.modifyNickname(member, player.getName()).queue();
-                            } catch (HierarchyException e){
-                                player.sendMessage(Utility.format("&cCould not modify discord name as your role exceeds the bots power level."));
-                            }
-                        }
-                    })
-                    .submit(DiscordLink.getInstance());
-            return CommandResult.success();
+        GuildMember member = optData.flatMap(Database.VerificationData::getGuildMember).orElse(null);
+        if (member == null && !optData.flatMap(Database.VerificationData::getDiscordUser).isPresent()) {
+            player.sendMessage(Utility.format("&cCould not verify your Discord account, please contact an Administrator!"));
+        } else if (member == null) {
+            String invite = "&cYour Discord account has been verified, but it is not in the DirtCraft Discord!";
+            invite += "\n&5&nClick Me&7 to &ajoin &7it";
+            sendDiscordInvite(player, invite);
         } else {
-            Task.builder()
-                    .async()
-                    .execute(() -> {
-                        if (storage.isVerified(player.getUniqueId())) {
-                            String discordID = storage.getDiscordUser(player.getUniqueId());
-                            @Nullable
-                            User user = SpongeDiscordLib.getJDA().retrieveUserById(discordID).complete();
-                            player.sendMessage(Utility.format(user != null ?
-                                    "&cYour account is already verified with &6" + user.getName() + "&8#&7" + user.getDiscriminator() + "&c!" :
-                                    "&cYour account is already verified!"));
-                        } else {
-                            Text.Builder text = Text.builder()
-                                    .append(Utility.format("\n" + "&5&nClick Me&7 to link your &9Discord&7 account and unlock additional features!" + "\n"));
-
-                                    try {
-                                        text.onHover(TextActions.showText(Utility.format("&5&nClick Me&7 to verify your Discord account!")));
-                                        text.onClick(TextActions.openUrl(new URL("http://verify.dirtcraft.gg/")));
-                                    } catch (MalformedURLException exception) {
-                                        text.onHover(TextActions.showText(Utility.format("&cMalformed URL, contact Administrator!")));
-                                    }
-                            PaginationList.builder()
-                                    .title(Utility.format("&cDirtCraft &7Verification"))
-                                    .padding(Utility.format("&4&m-"))
-                                    .contents(text.build())
-                                    .build()
-                                    .sendTo(player);
-                        }
-                    })
-                    .submit(DiscordLink.getInstance());
-
-            return CommandResult.success();
+            storage.updateRecord(code, player.getUniqueId());
+            Utility.setRoles(PlatformUtils.getPlayer(player), member);
+            String discordName = member.getUser().getName();
+            String discordTag = member.getUser().getDiscriminator();
+            player.sendMessage(Utility.format("&7Successfully verified &6" + player.getName() + "&7 with &6" + discordName + "&8#&7" + discordTag));
         }
     }
 
+    private void usage(Player player){
+        Optional<Database.VerificationData> optData = storage.getVerificationData(player.getUniqueId());
+        if (optData.flatMap(Database.VerificationData::getGuildMember).isPresent()) {
+            sendAlreadyVerifiedError(player, optData);
+        } else {
+            String invite = "\n&5&nClick Me&7 to link your &9Discord&7 account and unlock additional features!\n";
+            sendDiscordInvite(player, invite);
+        }
+    }
 
+    private void sendDiscordInvite(Player player, String message){
+        Text.Builder text = Text.builder().append(Utility.format(message));
+        try {
+            text.onHover(TextActions.showText(Utility.format("&5&nClick Me&7 to verify your Discord account!")));
+            text.onClick(TextActions.openUrl(new URL("http://verify.dirtcraft.gg/")));
+        } catch (MalformedURLException exception) {
+            text.onHover(TextActions.showText(Utility.format("&cMalformed URL, contact Administrator!")));
+        }
+        player.sendMessage(text.build());
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private void sendAlreadyVerifiedError(Player player, Optional<Database.VerificationData> optData){
+        String response = optData.flatMap(Database.VerificationData::getDiscordUser)
+                .map(user -> "&cYour account is already verified with &6" + user.getName() + "&8#&7" + user.getDiscriminator() + "&c!")
+                .orElse("&cYour account is already verified!");
+        player.sendMessage(Utility.format(response));
+    }
 }

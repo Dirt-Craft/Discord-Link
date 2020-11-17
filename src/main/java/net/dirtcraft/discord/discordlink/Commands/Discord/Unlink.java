@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.Role;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,8 +53,10 @@ public class Unlink implements DiscordCommandExecutor {
             response = user.flatMap(PlatformUser::getName).get();
         } else {
             response = storage.getLastKnownUsername(matcher.group(1));
-            if (response == null) response = storage.getUUIDfromDiscordID(matcher.group(1));
-            if (response == null) throw new DiscordCommandException("The user was not verified!");
+            if (response == null) response = storage.getVerificationData(matcher.group(1))
+                    .flatMap(Database.VerificationData::getUUID)
+                    .map(UUID::toString)
+                    .orElseThrow(()->new DiscordCommandException("The user was not verified!"));
         }
         storage.deleteRecord(matcher.group(1));
         Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);
