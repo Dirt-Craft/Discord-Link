@@ -22,6 +22,13 @@ public class PlatformUtils {
                 .map(PlatformUser::new);
     }
 
+    public static Optional<PlatformUser> getPlayerOffline(String identifier){
+        boolean isUUID = identifier.matches("(?i)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+        return Sponge.getServiceManager().provide(UserStorageService.class)
+                .flatMap(uss->isUUID? uss.get(UUID.fromString(identifier)): uss.get(identifier))
+                .map(PlatformUser::new);
+    }
+
     public static Optional<PlatformPlayer> getPlayer(PlatformUser player){
         return player.getPlayer().map(PlatformPlayer::new);
     }

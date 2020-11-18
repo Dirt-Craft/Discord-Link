@@ -17,11 +17,11 @@ import java.util.UUID;
 public class Unstuck implements DiscordCommandExecutor {
     @Override
     public void execute(MessageSource source, String cmd, List<String> args) throws DiscordCommandException {
-        Optional<PlatformUser> target = args.isEmpty() || !source.hasRole(Roles.MOD)? source.getPlayerData() : PlatformUtils.getPlayerOffline(UUID.fromString(args.get(0)));
-        PlatformUser player = target.orElseThrow(()->new DiscordCommandException("Could not locate players UUID."));
-        Task.builder() //-
+        Optional<PlatformUser> target = args.isEmpty() || !source.hasRole(Roles.STAFF)? source.getPlayerData() : PlatformUtils.getPlayerOffline(args.get(0));
+        String name = target.flatMap(PlatformUser::getName).orElseThrow(()->new DiscordCommandException("Could not locate players UUID."));
+        Task.builder()
                 .execute(() -> {
-                    String command = String.format("spawn other %s", player.getName());
+                    String command = String.format("spawn other %s", name);
                     Sponge.getCommandManager().process(source.getCommandSource(command), command);
                 }).submit(DiscordLink.getInstance());
     }
