@@ -1,11 +1,10 @@
 package net.dirtcraft.discord.discordlink.Commands;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.Discord.*;
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.EmbedBuilder;
 
@@ -70,6 +69,12 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .setRequiredRoles(Roles.VERIFIED)
                 .build();
 
+        DiscordCommand kits = DiscordCommand.builder()
+                .setDescription("Reveals a players kits.")
+                .setCommandExecutor(new Kits())
+                .setRequiredRoles(Roles.VERIFIED)
+                .build();
+
         DiscordCommand sync = DiscordCommand.builder()
                 .setDescription("Runs LP Sync to re-sync the perms")
                 .setCommandExecutor(new IngameCommand("lp sync"))
@@ -87,28 +92,51 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .setCommandExecutor(new NotifyBase())
                 .build();
 
-        register(list, "list");
+        DiscordCommand prefix = DiscordCommand.builder()
+                .setDescription("Sets prefixes")
+                .setCommandUsage("<title>")
+                .setRequiredRoles(Roles.STAFF)
+                .setCommandExecutor(new Prefix())
+                .build();
+
+        DiscordCommand version = DiscordCommand.builder()
+                .setDescription("Shows the current version")
+                .setRequiredRoles(Roles.DIRTY)
+                .setCommandExecutor(new Version())
+                .build();
+
+        DiscordCommand logs = DiscordCommand.builder()
+                .setDescription("Shows latest logs")
+                .setRequiredRoles(Roles.DIRTY)
+                .setCommandExecutor(new Logs())
+                .build();
+
+        register(list, "list", "players");
         register(stop, "stop");
         register(halt, "halt");
         register(seen, "seen");
         register(unstuck, "unstuck", "spawn");
         register(username, "username");
         register(discord, "discord");
-        register(ranks, "ranks");
+        register(ranks, "ranks", "groups", "parents");
         register(sync, "sync");
         register(unverify, "unverify", "unlink");
         register(notify, "notify");
+        register(prefix, "prefix");
+        register(kits, "kits");
+        register(version, "version", "info");
+        register(logs, "logs");
     }
 
     public void process(MessageSource member, String args){
         try {
-            String[] command = args == null || defaultAliases.contains(args)? new String[0] : args.toLowerCase().split(" ");
+            String[] command = args == null || defaultAliases.contains(args)? new String[0] : args.split(" ");
             execute(member, null, new ArrayList<>(Arrays.asList(command)));
         } catch (Exception e){
             String message = e.getMessage() != null? e.getMessage() : "an error occurred while executing the command.";
             Utility.sendCommandError(member, message);
         } finally {
-            member.getMessage().delete().queue();
+            if (!member.isPrivateMessage()) member.getMessage().delete().queue();
         }
     }
 
@@ -120,7 +148,8 @@ public class DiscordCommandManager extends DiscordCommandTree {
             if (!cmd.hasPermission(member)) return;
             String title = pre + alias + " " + cmd.getUsage();
             embed.addField(title, cmd.getDescription(), false);
+            embed.setFooter("Requested By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl());
         });
-        GameChat.sendMessage(embed.build());
+        member.sendCommandResponse(embed.build());
     }
 }

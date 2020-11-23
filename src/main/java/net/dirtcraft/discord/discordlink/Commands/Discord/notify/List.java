@@ -1,10 +1,9 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord.notify;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Member;
 
@@ -22,7 +21,7 @@ public class List implements DiscordCommandExecutor {
                     .map(Member::getEffectiveName)
                     .map(s->" **-** " + s)
                     .collect(Collectors.joining("\n"));
-            GameChat.sendEmbed("People to notify:", staff, 30);
+            source.sendCommandResponse("People to notify:", staff, 30);
         } catch (Exception e){
             throw new DiscordCommandException(e.getMessage());
         }

@@ -1,6 +1,5 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.Discord.notify.Add;
@@ -9,8 +8,8 @@ import net.dirtcraft.discord.discordlink.Commands.Discord.notify.Remove;
 import net.dirtcraft.discord.discordlink.Commands.Discord.notify.Time;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandTree;
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.EmbedBuilder;
 
@@ -19,7 +18,7 @@ public class NotifyBase extends DiscordCommandTree {
         DiscordCommand time = DiscordCommand.builder()
                 .setDescription("Sets when the boot failure threshold is reached, In minutes")
                 .setPreBootEnabled(true)
-                .setRequiredRoles(Roles.DIRTY)
+                .setRequiredRoles(Roles.ADMIN)
                 .setCommandUsage("[<number>]")
                 .setCommandExecutor(new Time())
                 .build();
@@ -60,7 +59,8 @@ public class NotifyBase extends DiscordCommandTree {
             if (!cmd.hasPermission(member)) return;
             String header = pre + command + " " + alias + " " + cmd.getUsage();
             embed.addField(header, cmd.getDescription(), false);
+            embed.setFooter("Requested By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl());
         });
-        GameChat.sendMessage(embed.build(), 30);
+        member.sendCommandResponse(embed.build(), 30);
     }
 }

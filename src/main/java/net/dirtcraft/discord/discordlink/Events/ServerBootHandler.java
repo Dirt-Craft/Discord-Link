@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
@@ -15,13 +15,12 @@ import java.awt.*;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Notifier.maxStageMinutes;
-import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Notifier.notify;
+import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Notifier.maxStageMinutes;
+import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Notifier.notify;
 
 public class ServerBootHandler {
     private final long second = 1000;
     final private long minute = second * 60;
-    private final String modpack = SpongeDiscordLib.getServerName();
     private final long time = System.currentTimeMillis();
     private volatile GameState state;
 
@@ -82,17 +81,19 @@ public class ServerBootHandler {
                 .build();
         if (future != null) future = future
                 .whenComplete((message, throwable) -> message.delete().queue())
-                .thenApply(message -> GameChat.getChannel().sendMessage(embed).complete());
-        else future = GameChat.getChannel().sendMessage(embed).submit();
+                .thenApply(message -> Channels.getDefaultChannel().sendMessage(embed).complete());
+        else future = Channels.getDefaultChannel().sendMessage(embed).submit();
     }
 
     private void sendMessage(RestAction<PrivateChannel> channelRestAction){
         if (DiscordLink.getJDA() == null) return;
         try {
+            final String name = SpongeDiscordLib.getServerName();
+            final String id = SpongeDiscordLib.getGamechatChannelID();
             long ms = (System.currentTimeMillis() - time);
             double minutes = (double) Math.max(ms, 1) / minute;
             String template = "Server %s has been attempting to boot for %dms (%.1f minutes) @ <#%s>";
-            String message = String.format(template, modpack, ms, minutes, SpongeDiscordLib.getGamechatChannelID());
+            String message = String.format(template, name, ms, minutes, id);
             channelRestAction.queue(m -> m.sendMessage(message).queue());
         } catch (Exception ignored){
             //no one cares bro

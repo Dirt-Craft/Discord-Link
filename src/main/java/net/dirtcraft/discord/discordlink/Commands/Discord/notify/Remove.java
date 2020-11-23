@@ -1,11 +1,10 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord.notify;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ public class Remove implements DiscordCommandExecutor {
         try {
             PluginConfiguration.Notifier.notify.remove(source.getUser().getIdLong());
             DiscordLink.getInstance().saveConfig();
-            GameChat.sendEmbed("Command successfully executed", "Removed " + source.getEffectiveName() + " from the notification list.", 30);
+            source.sendCommandResponse("Command successfully executed", "Removed " + source.getEffectiveName() + " from the notification list.", 30);
         } catch (Exception e){
             throw new DiscordCommandException(e.getMessage());
         }

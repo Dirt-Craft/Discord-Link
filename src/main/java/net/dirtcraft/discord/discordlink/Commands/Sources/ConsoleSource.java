@@ -3,7 +3,6 @@ package net.dirtcraft.discord.discordlink.Commands.Sources;
 import net.dirtcraft.dirtlocker.API.ConsoleLock.SecuredSource;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
@@ -16,28 +15,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public abstract class WrappedConsole implements ConsoleSource, SecuredSource, ScheduledSender {
+public abstract class ConsoleSource implements org.spongepowered.api.command.source.ConsoleSource, SecuredSource {
 
     private CommandSource actualSource;
 
-    WrappedConsole(){
+    public ConsoleSource(){
         actualSource = Sponge.getServer().getConsole();
-    }
-
-
-    @Override
-    public void sendMessage(Text message) {
-        ResponseScheduler.submit(this, message.toPlain());
     }
 
     @Override
     public void sendMessages(Iterable<Text> messages) {
-        for (Text message : messages) ResponseScheduler.submit(this, message.toPlain());
+        for (Text message : messages) sendMessage(message);
     }
 
     @Override
     public void sendMessages(Text... messages) {
-        for (Text message : messages) ResponseScheduler.submit(this, message.toPlain());
+        for (Text message : messages) sendMessage(message);
     }
 
     @Override

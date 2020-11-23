@@ -1,7 +1,7 @@
 package net.dirtcraft.discord.discordlink.Events;
 
 import br.net.fabiozumbi12.UltimateChat.Sponge.API.SendChannelMessageEvent;
-import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -22,7 +22,7 @@ public class UltimateChat {
         String username = player.getName();
         String message = TextSerializers.FORMATTING_CODE.stripCodes(Utility.sanitiseMinecraftText(event.getMessage().toPlain()));
 
-        GameChat.sendPlayerMessage(prefix, username, message);
+        Channels.sendPlayerMessage(prefix, username, message);
     }
 
 }

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class Ranks implements DiscordCommandExecutor {
+public class Kits implements DiscordCommandExecutor {
     private PermissionUtils provider;
 
     @Override
@@ -33,6 +33,6 @@ public class Ranks implements DiscordCommandExecutor {
         if (!player.isPresent()) {
             String response = args.isEmpty()? "You are not correctly verified, or have not played on this server." : "Invalid user. Either the user does not exist or they have never played on this server.";
             source.sendCommandResponse(response, 30);
-        } else provider.printUserGroups(source, player.map(PlatformUser::getUser).get());
+        } else provider.printUserKits(source, player.map(PlatformUser::getUser).get());
     }
 }

@@ -13,7 +13,7 @@ public class DiscordCommandTree implements DiscordCommandExecutor {
 
     public void register(DiscordCommand command, String... alias){
         for (String name : alias) {
-            commandMap.put(name, command);
+            commandMap.put(name.toLowerCase(), command);
         }
     }
 
@@ -25,7 +25,7 @@ public class DiscordCommandTree implements DiscordCommandExecutor {
         }
 
         String base = args.remove(0);
-        DiscordCommand discordCommand = commandMap.get(base);
+        DiscordCommand discordCommand = commandMap.get(base.toLowerCase());
 
         if (discordCommand != null) discordCommand.process(member, base, args);
         else throw new DiscordCommandException("Command not found");

@@ -1,5 +1,6 @@
-package net.dirtcraft.discord.discordlink.Configuration;
+package net.dirtcraft.discord.discordlink.Storage;
 
+import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
@@ -33,11 +34,20 @@ public class PluginConfiguration {
         @Setting(value = "Console-Prefix", comment = "Prefix to use console command")
         public static String consolePublic = "/";
 
+        @Setting(value = "Silent-Manager-Console-Prefix", comment = "Prefix to use private console command (Full Access, Set different from non-proxy Discord-Link)")
+        public static String bungeePrivate = "#$";
+
+        @Setting(value = "Console-Manager-Prefix", comment = "Prefix to use bungee command (Full Access, Set different from non-proxy Discord-Link)")
+        public static String bungeePublic = "$";
+
         @Setting(value = "Bot-Prefix", comment = "Prefix to use bot commands")
         public static String discordCommand = "!";
 
+        @Setting(value = "defaultChannelId")
+        public static Long defaultChannelID = Long.parseLong(SpongeDiscordLib.getGamechatChannelID());
+
         @Setting(value = "Discord-Server-ID")
-        public static String discordServerID = "269639757351354368";
+        public static String serverLogChannelID = "566095634008899585";
 
     }
 
@@ -91,7 +101,10 @@ public class PluginConfiguration {
         public static String adminRoleID = "531631265443479562";
 
         @Setting(value = "Moderator-Role-ID")
-        public static String modRoleID = "332701183477284867";
+        public static String moderatorRoleID = "332701183477284867";
+
+        @Setting(value = "Helper-Role-ID")
+        public static String helperRoleID = "563538434333999108";
 
         @Setting(value = "Staff-Role-ID")
         public static String staffRoleID = "549039481450397699";

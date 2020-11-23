@@ -16,17 +16,17 @@ public class ResponseScheduler {
 
     private ResponseScheduler() {
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new Messenger(), 1250, 1250);
+        timer.scheduleAtFixedRate(new Messenger(), 1000, 1000);
     }
 
-    public static void submit(ScheduledSender provider, String message) {
+    public static void submit(DiscordResponder provider, String message) {
         instance.tasks.add(new Message(provider, message));
     }
 
     private static class Message {
-        final ScheduledSender provider;
+        final DiscordResponder provider;
         final String message;
-        private Message(ScheduledSender provider, String message){
+        private Message(DiscordResponder provider, String message){
             this.message = message;
             this.provider = provider;
         }
@@ -35,7 +35,7 @@ public class ResponseScheduler {
     private class Messenger extends TimerTask {
         @Override
         public void run() {
-            Multimap<ScheduledSender, String> messages = ArrayListMultimap.create();
+            Multimap<DiscordResponder, String> messages = ArrayListMultimap.create();
             while (!tasks.isEmpty()){
                 Message message = tasks.poll();
                 messages.put(message.provider, message.message);
@@ -43,7 +43,7 @@ public class ResponseScheduler {
             messages.keySet().forEach(provider -> dispatchMessages(provider, messages.get(provider)));
         }
 
-        private void dispatchMessages(ScheduledSender provider, Collection<String> messages){
+        private void dispatchMessages(DiscordResponder provider, Collection<String> messages){
             StringBuilder output = new StringBuilder();
             for (String message : messages){
                 if (provider.sanitise()) message = Utility.sanitiseMinecraftText(message);

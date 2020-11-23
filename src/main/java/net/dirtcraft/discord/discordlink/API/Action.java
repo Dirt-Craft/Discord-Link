@@ -1,20 +1,19 @@
 package net.dirtcraft.discord.discordlink.API;
 
-
-import net.dirtcraft.discord.discordlink.Commands.Sources.GamechatSender;
-import net.dirtcraft.discord.discordlink.Commands.Sources.PrivateSender;
-import net.dirtcraft.discord.discordlink.Commands.Sources.WrappedConsole;
+import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
+import net.dirtcraft.discord.discordlink.Commands.Sources.DiscordResponder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
-import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Main.*;
+import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Main.*;
 
 public enum Action {
-    CHAT            ( "\n",    Sender.NONE,     Type.CHAT_MESSAGE),
-    PUBLIC_BUNGEE   ( "$",     Sender.GAMECHAT, Type.BUNGEE_COMMAND  ),
-    PRIVATE_BUNGEE  ( "#$",    Sender.PRIVATE,  Type.BUNGEE_COMMAND  ),
+    CHAT            ( "\n",    Sender.NONE,     Type.CHAT_MESSAGE    ),
+    PUBLIC_BUNGEE   ( bungeePublic,   Sender.GAMECHAT, Type.BUNGEE_COMMAND  ),
+    PRIVATE_BUNGEE  ( bungeePrivate,  Sender.PRIVATE,  Type.BUNGEE_COMMAND  ),
     PUBLIC_COMMAND  ( consolePublic,  Sender.GAMECHAT, Type.CONSOLE_COMMAND ),
     PRIVATE_COMMAND ( consolePrivate, Sender.PRIVATE,  Type.CONSOLE_COMMAND ),
     DISCORD_COMMAND ( discordCommand, Sender.NONE,     Type.DISCORD_COMMAND );
@@ -29,11 +28,20 @@ public enum Action {
         this.type = type;
     }
 
+    public static String filterConsolePrefixes(String command){
+        String prefixes = Arrays.stream(values())
+                .filter(Action::isConsole)
+                .map(Action::getPrefix)
+                .collect(Collectors.joining("|"));
+        return command.replaceAll("^(" + prefixes + ")", "");
+    }
+
     public static Action fromMessageRaw(String rawMessage){
         return Arrays.stream(values())
                 .filter(cmd->rawMessage.startsWith(cmd.prefix))
                 .filter(cmd->cmd != CHAT)
-                .findFirst().orElse(CHAT);
+                .max(Comparator.comparingInt(Action::length))
+                .orElse(CHAT);
     }
 
     public String getCommand(MessageReceivedEvent event){
@@ -52,6 +60,10 @@ public enum Action {
         return type == Type.DISCORD_COMMAND;
     }
 
+    public boolean isBungee(){
+        return type == Type.BUNGEE_COMMAND;
+    }
+
     public boolean isPrivate() {
         return sender == Sender.PRIVATE;
     }
@@ -60,20 +72,16 @@ public enum Action {
         return prefix;
     }
 
-    public WrappedConsole getSender(GuildMember sender, String command){
+    public ConsoleSource getCommandSource(MessageSource sender, String command){
         if (this.sender == Sender.PRIVATE) {
-            return new PrivateSender(sender, command);
+            return DiscordResponder.getSender(sender);
         } else {
-            return new GamechatSender(sender, command);
+            return DiscordResponder.getSender(sender.getChannel().getCommandResponder(sender, command));
         }
     }
 
-    public static String filterConsolePrefixes(String command){
-        String prefixes = Arrays.stream(values())
-                .filter(Action::isConsole)
-                .map(Action::getPrefix)
-                .collect(Collectors.joining("|"));
-        return command.replaceAll("^(" + prefixes + ")", "");
+    private int length() {
+        return prefix.length();
     }
 
     public enum Sender{
