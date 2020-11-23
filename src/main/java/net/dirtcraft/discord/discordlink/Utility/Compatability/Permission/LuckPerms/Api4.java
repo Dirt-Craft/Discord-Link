@@ -7,7 +7,6 @@ import me.lucko.luckperms.api.Track;
 import me.lucko.luckperms.api.caching.MetaData;
 import me.lucko.luckperms.api.context.ContextSet;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 
@@ -21,7 +20,6 @@ import java.util.concurrent.CompletableFuture;
 import static net.dirtcraft.discord.discordlink.Storage.Permission.PROMOTE_PERMISSION_GROUP_PREFIX;
 
 public class Api4 extends LuckPermissions {
-    @NonNull
     private LuckPermsApi api = me.lucko.luckperms.LuckPerms.getApi();
     private ContextSet contexts = api.getContextManager().getStaticContexts().getContexts();
 
@@ -152,7 +150,7 @@ public class Api4 extends LuckPermissions {
 
     public Optional<String> getPrefix(UUID uuid){
         return Optional.ofNullable(api.getUserManager().getUser(uuid))
-                .map(u->u.getCachedData().getMetaData(Contexts.global().setContexts(contexts)))
+                .map(u->u.getCachedData().getMetaData(Contexts.of(contexts, Contexts.global().getSettings())))
                 .map(MetaData::getPrefix);
     }
 }

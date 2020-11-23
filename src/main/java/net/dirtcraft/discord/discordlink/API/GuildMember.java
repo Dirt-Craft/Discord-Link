@@ -9,7 +9,6 @@ import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.*;
 
@@ -99,7 +98,7 @@ public class GuildMember extends WrappedMember {
         return highestRank.getStyle();
     }
 
-    @NonNull public Roles getHighestRank(){
+    public Roles getHighestRank(){
         return highestRank;
     }
 }

@@ -28,7 +28,7 @@ public enum Roles {
         this.isStaff = isStaff;
     }
 
-    @Nullable public Role getRole(){
+    public Role getRole(){
         return Channels.getGuild().getRoleById(id);
     }
 
