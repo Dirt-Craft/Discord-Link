@@ -23,7 +23,7 @@ dependencies {
     compile 'org.spongepowered:spongeapi:5.2.0-SNAPSHOT'
     compile 'br.net.fabiozumbi12.UltimateChat:UltimateChat-Sponge-56:1.9.1'
     compile 'io.github.nucleuspowered:nucleus-api:1.1.10-LTS-COMMUNITY-S5.1'
-    compile 'com.github.Dirt-Craft:Sponge-Discord-Lib:API-5-SNAPSHOT'
+    compile 'com.github.Dirt-Craft:Sponge-Discord-Lib:Sponge_API-5-SNAPSHOT'
     compile 'com.github.Dirt-Craft:Dirt-Database-Lib:API-5-SNAPSHOT'
 }
 

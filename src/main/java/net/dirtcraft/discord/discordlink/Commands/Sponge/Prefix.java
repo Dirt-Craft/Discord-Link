@@ -2,8 +2,8 @@ package net.dirtcraft.discord.discordlink.Commands.Sponge;
 
 import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
 import net.dirtcraft.discord.discordlink.Storage.Permission;
+import net.dirtcraft.discord.discordlink.Storage.Settings;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
-import net.dirtcraft.discord.discordlink.Utility.Pair;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -18,16 +18,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Prefix implements CommandExecutor {
-    private final Map<String, String> staffPrefixMap = Stream.of(
-            new Pair<>(Permission.ROLES_ADMIN,     "&4&lA"),
-            new Pair<>(Permission.ROLES_MODERATOR, "&9&lM"),
-            new Pair<>(Permission.ROLES_HELPER,    "&5&lH"),
-            new Pair<>(Permission.ROLES_BUILDER,   "&6&lB")
-    ).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
     private final Set<String> forbidden = new HashSet<>(Arrays.asList("staff", "helper", "mod", "moderator", "admin", "manager", "owner"));
 
     @Nonnull
@@ -73,7 +65,7 @@ public class Prefix implements CommandExecutor {
             }
 
             String chevron = getChevron(target, caratColor, ignoreDonor);
-            String rankPrefix = staffPrefixMap.entrySet().stream()
+            String rankPrefix = Settings.STAFF_PREFIXES.entrySet().stream()
                     .filter(p->target.hasPermission(p.getKey()))
                     .map(Map.Entry::getValue)
                     .findFirst()
