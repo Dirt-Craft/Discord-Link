@@ -12,7 +12,10 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.user.UserStorageService;
 
-import java.util.*;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Optional;
 
 public class Prefix implements DiscordCommandExecutor {
 
