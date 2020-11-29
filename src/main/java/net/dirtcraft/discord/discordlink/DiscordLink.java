@@ -131,7 +131,7 @@ public class DiscordLink extends ServerBootHandler {
                 .permission(Permission.PREFIX_GROUP)
                 .executor(new Group())
                 .arguments(GenericArguments.onlyOne(GenericArguments.playerOrSource(Text.of("Target"))),
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("Group"))))
+                        GenericArguments.optional(GenericArguments.onlyOne(GenericArguments.string(Text.of("Group")))))
                 .build();
 
         CommandSpec test = CommandSpec.builder()
@@ -158,11 +158,11 @@ public class DiscordLink extends ServerBootHandler {
 
         CommandSpec prefix = CommandSpec.builder()
                 .permission(Permission.PREFIX_USE)
-                .child(clear, "clear", "none")
-                .child(toggle, "toggle", "arrow", "star")
-                .child(set, "set")
-                .child(group, "group")
-                .child(test, "test")
+                .child(clear, "clear", "none", "c")
+                .child(toggle, "toggle", "arrow", "star", "t")
+                .child(set, "set", "s")
+                .child(group, "group", "g")
+                .child(test, "debug", "test", "d")
                 .build();
 
         Sponge.getCommandManager().register(this, verify, "verify", "link");
