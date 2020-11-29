@@ -19,7 +19,7 @@ public abstract class ConsoleSource implements org.spongepowered.api.command.sou
 
     private CommandSource actualSource;
 
-    ConsoleSource(){
+    public ConsoleSource(){
         actualSource = Sponge.getServer().getConsole();
     }
 

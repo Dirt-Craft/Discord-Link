@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.io.File;
+
 public class MessageSource extends GuildMember implements DiscordResponder {
     private final Message message;
     private final Channel source;
@@ -36,6 +38,10 @@ public class MessageSource extends GuildMember implements DiscordResponder {
     @Override
     public boolean sanitise(){
         return false;
+    }
+
+    public Channel getChannel(){
+        return source;
     }
 
     public ConsoleSource getCommandSource(String command){
@@ -84,5 +90,12 @@ public class MessageSource extends GuildMember implements DiscordResponder {
 
     public void sendPrivateMessage(MessageEmbed message){
         getUser().openPrivateChannel().queue(dm -> dm.sendMessage(message).queue());
+    }
+
+    public void sendPrivateFile(File file){
+        getUser().openPrivateChannel()
+                .flatMap(a->a.sendFile(file))
+                .submit();
+
     }
 }

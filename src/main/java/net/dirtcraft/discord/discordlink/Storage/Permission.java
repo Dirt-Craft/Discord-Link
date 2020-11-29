@@ -5,6 +5,11 @@ public class Permission {
     public static final String PROMOTE_PERMISSION = "discordlink.promote.use";
 
     public static final String PREFIX_USE = "discordlink.prefix.use";
+    public static final String PREFIX_MODIFY = "discordlink.prefix.modify";
+    public static final String PREFIX_TEST = "discordlink.prefix.test";
+    public static final String PREFIX_GROUP = "discordlink.prefix.group";
+    public static final String PREFIX_TOGGLE = "discordlink.prefix.toggle";
+    public static final String PREFIX_CLEAR = "discordlink.prefix.clear";
     public static final String PREFIX_OTHERS = "discordlink.prefix.others";
     public static final String PREFIX_ARROW = "discordlink.prefix.arrow";
     public static final String PREFIX_BRACKETS = "discordlink.prefix.brackets";

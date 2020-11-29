@@ -13,7 +13,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class Channel {
-
     private final long channel;
     private final boolean isPrivate;
 

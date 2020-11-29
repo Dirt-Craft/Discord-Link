@@ -105,6 +105,12 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .setCommandExecutor(new Version())
                 .build();
 
+        DiscordCommand logs = DiscordCommand.builder()
+                .setDescription("Shows latest logs")
+                .setRequiredRoles(Roles.DIRTY)
+                .setCommandExecutor(new Logs())
+                .build();
+
         register(list, "list", "players");
         register(stop, "stop");
         register(halt, "halt");
@@ -119,6 +125,7 @@ public class DiscordCommandManager extends DiscordCommandTree {
         register(prefix, "prefix");
         register(kits, "kits");
         register(version, "version", "info");
+        register(logs, "logs");
     }
 
     public void process(MessageSource member, String args){

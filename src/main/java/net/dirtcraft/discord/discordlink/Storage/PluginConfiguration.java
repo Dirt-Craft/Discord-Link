@@ -34,14 +34,17 @@ public class PluginConfiguration {
         @Setting(value = "Console-Prefix", comment = "Prefix to use console command")
         public static String consolePublic = "/";
 
+        @Setting(value = "Silent-Manager-Console-Prefix", comment = "Prefix to use private console command (Full Access, Set different from non-proxy Discord-Link)")
+        public static String bungeePrivate = "#$";
+
+        @Setting(value = "Console-Manager-Prefix", comment = "Prefix to use bungee command (Full Access, Set different from non-proxy Discord-Link)")
+        public static String bungeePublic = "$";
+
         @Setting(value = "Bot-Prefix", comment = "Prefix to use bot commands")
         public static String discordCommand = "!";
 
-        @Setting(value = "Discord-Server-ID")
-        public static String discordServerID = "269639757351354368";
-
-        @Setting(value = "Discord-Server-ID")
-        public static String gamechatChannelID = SpongeDiscordLib.getGamechatChannelID();
+        @Setting(value = "defaultChannelId")
+        public static Long defaultChannelID = Long.parseLong(SpongeDiscordLib.getGamechatChannelID());
 
         @Setting(value = "Discord-Server-ID")
         public static String serverLogChannelID = "566095634008899585";

@@ -5,9 +5,8 @@ import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordPermissionException;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
-import org.spongepowered.api.GameState;
-import org.spongepowered.api.Sponge;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +30,12 @@ public class DiscordCommand {
         return allowedRoles.stream().allMatch(member::hasRole);
     }
 
-    public static Builder builder(){
+    public static Builder builder()         {
         return new Builder();
     }
 
     public final void process(MessageSource member, String command, List<String> args) {
-        if (Sponge.getGame().getState() != GameState.SERVER_STARTED && !preBoot) return;
+        if (!preBoot && !PlatformUtils.isGameReady()) return;
         if (!allowedRoles.stream().allMatch(member::hasRole)) {
             Utility.sendPermissionError(member);
             return;

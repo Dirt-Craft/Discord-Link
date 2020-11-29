@@ -1,6 +1,7 @@
 package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Default;
 
 import net.dirtcraft.discord.discordlink.API.MessageSource;
+import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -22,13 +23,23 @@ public class DefaultProvider extends PermissionUtils {
     }
 
     @Override
-    public void setPlayerPrefix(User target, String prefix) {
+    public void setPlayerPrefix(ConsoleSource source, User target, String prefix) {
 
     }
 
     @Override
-    public void clearPlayerPrefix(User target) {
+    public void clearPlayerPrefix(ConsoleSource source, User target) {
 
+    }
+
+    @Override
+    public void setPlayerPrefix(MessageSource source, User target, String prefix){
+        source.sendCommandResponse("This version of luckperms is not supported!");
+    }
+
+    @Override
+    public void clearPlayerPrefix(MessageSource source, User target){
+        source.sendCommandResponse("This version of luckperms is not supported!");
     }
 
     @Override

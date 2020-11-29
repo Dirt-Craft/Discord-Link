@@ -1,6 +1,9 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.API.*;
+import net.dirtcraft.discord.discordlink.API.Action;
+import net.dirtcraft.discord.discordlink.API.Channels;
+import net.dirtcraft.discord.discordlink.API.MessageSource;
+import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
@@ -30,11 +33,10 @@ public class DiscordEvents extends ListenerAdapter {
         if (!gamechat && !privateDm || event.getAuthor().isBot() || hasAttachment(event)) return;
         CompletableFuture.runAsync(()->{
             try {
-                final Channel chat = new Channel(event.getChannel().getIdLong());
                 final MessageSource sender = new MessageSource(event);
-                if (!sender.isVerified() && !sender.isStaff()) processUnverifiedMessage(chat, sender, event);
-                else if (privateDm) processPrivateMessage(chat, sender, event);
-                else processGuildMessage(chat, sender, event);
+                if (!sender.isVerified() && !sender.isStaff()) processUnverifiedMessage(sender, event);
+                else if (privateDm) processPrivateMessage(sender, event);
+                else processGuildMessage(sender, event);
             } catch (Exception e){
                 DiscordLink.getInstance().getLogger().warn("Exception while processing gamechat message!", e);
                 Utility.dmExceptionAsync(e, 248056002274918400L);
@@ -42,28 +44,28 @@ public class DiscordEvents extends ListenerAdapter {
         });
     }
 
-    public void processGuildMessage(Channel chat, MessageSource sender, MessageReceivedEvent event) {
+    public void processGuildMessage(MessageSource sender, MessageReceivedEvent event) {
         final String rawMessage = event.getMessage().getContentRaw();
         final Action intent = Action.fromMessageRaw(rawMessage);
 
         if (intent.isBotCommand()) commandManager.process(sender, intent.getCommand(event));
         else if (PlatformUtils.isGameReady() && intent.isChat()) PlatformChat.discordToMCAsync(sender, event);
         else if (PlatformUtils.isGameReady() && intent.isConsole()) {
-            boolean executed = toConsole(chat, intent.getCommand(event), sender, intent);
+            boolean executed = toConsole(intent.getCommand(event), sender, intent);
             if (executed && intent.isPrivate()) Utility.logCommand(sender, "__Executed Private Command__");
             event.getMessage().delete().queue(s->{},e->{});
         }
     }
 
-    public void processPrivateMessage(Channel chat, MessageSource sender, MessageReceivedEvent event) {
+    public void processPrivateMessage(MessageSource sender, MessageReceivedEvent event) {
         if (!PlatformUtils.isGameReady()) return;
         final Action intent = Action.fromMessageRaw(event.getMessage().getContentRaw()) == Action.DISCORD_COMMAND? Action.DISCORD_COMMAND: Action.PRIVATE_COMMAND;
         final String message = Action.filterConsolePrefixes(event.getMessage().getContentRaw());
         if (intent == Action.DISCORD_COMMAND) commandManager.process(sender, intent.getCommand(event));
-        else if (toConsole(chat, message, sender, intent)) logCommand(sender, "__Executed Private Command via DM__");
+        else if (toConsole(message, sender, intent)) logCommand(sender, "__Executed Private Command via DM__");
     }
 
-    public void processUnverifiedMessage(Channel chat, MessageSource sender, MessageReceivedEvent event){
+    public void processUnverifiedMessage(MessageSource sender, MessageReceivedEvent event){
         if (event.getChannelType() != ChannelType.PRIVATE) event.getMessage().delete().queue();
         Database database = DiscordLink.getInstance().getStorage();
         Database.VerificationData data = database.getVerificationData(sender.getId()).orElse(null);

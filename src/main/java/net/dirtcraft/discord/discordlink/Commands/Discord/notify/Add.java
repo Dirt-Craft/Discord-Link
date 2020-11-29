@@ -11,8 +11,9 @@ import java.util.List;
 public class Add implements DiscordCommandExecutor {
     @Override
     public void execute(MessageSource source, String command, List<String> args) throws DiscordCommandException {
+        if (PluginConfiguration.Notifier.notify.contains(source.getIdLong())) throw new DiscordCommandException("User already present!");
         try {
-            PluginConfiguration.Notifier.notify.add(source.getUser().getIdLong());
+            PluginConfiguration.Notifier.notify.add(source.getIdLong());
             DiscordLink.getInstance().saveConfig();
             source.sendCommandResponse("Command successfully executed", "Added " + source.getEffectiveName() + " to the notification list.", 30);
         } catch (Exception e){

@@ -39,15 +39,12 @@ public class UnVerify implements CommandExecutor {
             player.sendMessage(Utility.format("&cYour account is not verified!"));
         } else {
             data.deleteRecord();
+            Guild guild = Channels.getGuild();
             String response = data.getDiscordUser()
                     .map(user->"&7The account &6" + user.getName() + "&8#&7" + user.getDiscriminator() + " has been &cunverified")
                     .orElse("&7Your account has been &cunverified");
             player.sendMessage(Utility.format(response));
-            data.getGuildMember().ifPresent(member->{
-                Guild guild = Channels.getGuild();
-                Utility.removeRoleIfPresent(guild, member, Roles.VERIFIED);
-                Utility.removeRoleIfPresent(guild, member, Roles.DONOR);
-            });
+            data.getGuildMember().ifPresent(member-> Utility.removeRoleIfPresent(guild, member, Roles.VERIFIED));
         }
     }
 }

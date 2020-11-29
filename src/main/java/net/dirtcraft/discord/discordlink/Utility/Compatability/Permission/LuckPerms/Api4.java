@@ -152,7 +152,7 @@ public class Api4 extends LuckPermissions {
 
     public Optional<String> getPrefix(UUID uuid){
         return Optional.ofNullable(api.getUserManager().getUser(uuid))
-                .map(u->u.getCachedData().getMetaData(Contexts.global().setContexts(contexts)))
+                .map(u->u.getCachedData().getMetaData(Contexts.of(contexts, Contexts.global().getSettings())))
                 .map(MetaData::getPrefix);
     }
 }

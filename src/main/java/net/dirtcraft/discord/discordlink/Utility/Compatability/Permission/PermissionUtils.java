@@ -1,6 +1,7 @@
 package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission;
 
 import net.dirtcraft.discord.discordlink.API.MessageSource;
+import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Default.DefaultProvider;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.LuckPerms.Api4;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.LuckPerms.Api5;
@@ -21,9 +22,13 @@ public abstract class PermissionUtils {
 
     public abstract void printUserKits(MessageSource source, User player);
 
-    public abstract void setPlayerPrefix(User target, String prefix);
+    public abstract void setPlayerPrefix(MessageSource source, User target, String prefix);
 
-    public abstract void clearPlayerPrefix(User target);
+    public abstract void setPlayerPrefix(ConsoleSource source, User target, String prefix);
+
+    public abstract void clearPlayerPrefix(MessageSource source, User target);
+
+    public abstract void clearPlayerPrefix(ConsoleSource source, User target);
 
     public abstract Optional<String> getPrefix(UUID uuid);
 

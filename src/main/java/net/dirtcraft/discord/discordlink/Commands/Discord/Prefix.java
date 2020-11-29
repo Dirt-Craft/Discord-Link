@@ -4,9 +4,9 @@ import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Storage.Permission;
+import net.dirtcraft.discord.discordlink.Storage.Settings;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
-import net.dirtcraft.discord.discordlink.Utility.Pair;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.Subject;
@@ -16,16 +16,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Prefix implements DiscordCommandExecutor {
-    private final Map<String, String> staffPrefixMap = Stream.of(
-            new Pair<>(Permission.ROLES_ADMIN,     "&4&lA"),
-            new Pair<>(Permission.ROLES_MODERATOR, "&9&lM"),
-            new Pair<>(Permission.ROLES_HELPER,    "&5&lH"),
-            new Pair<>(Permission.ROLES_BUILDER,   "&6&lB")
-    ).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 
     @Override
     public void execute(MessageSource source, String command, List<String> args) throws DiscordCommandException {
@@ -37,9 +29,9 @@ public class Prefix implements DiscordCommandExecutor {
         String color = getColor(args);
         if (args.isEmpty()) throw new DiscordCommandException("You must specify a prefix");
         else if (args.size() == 1 && args.get(0).equalsIgnoreCase("none")){
-            PermissionUtils.INSTANCE.clearPlayerPrefix(target);
+            PermissionUtils.INSTANCE.clearPlayerPrefix(source, target);
         }
-        String rankPrefix = staffPrefixMap.entrySet().stream()
+        String rankPrefix = Settings.STAFF_PREFIXES.entrySet().stream()
                 .filter(p->target.hasPermission(p.getKey()))
                 .map(Map.Entry::getValue)
                 .findFirst()
@@ -48,7 +40,7 @@ public class Prefix implements DiscordCommandExecutor {
         String title = String.join(" ", args);
 
         String prefix = String.format("%s %s[%s%s]&r", arrow, rankPrefix, title, color).replaceAll("\\?\"", "");
-        PermissionUtils.INSTANCE.setPlayerPrefix(target, prefix);
+        PermissionUtils.INSTANCE.setPlayerPrefix(source, target, prefix);
     }
 
     private Optional<User> getTarget(Subject source, List<String> args) {
@@ -61,7 +53,7 @@ public class Prefix implements DiscordCommandExecutor {
     }
 
     private String getChevron(User user, List<String> args){
-        String carat = !ignoreDonor(args) && user.hasPermission(Permission.ROLES_DONOR) && user.hasPermission(Permission.ROLES_STAFF)? "&l✯" : "&l»";
+        String carat = !ignoreDonor(args) && user.hasPermission(Permission.ROLES_DONOR) ? "&l✯" : "&l»";
         ListIterator<String> argsIterator = args.listIterator();
         String chevronColour = "&a";
         while (argsIterator.hasNext()){

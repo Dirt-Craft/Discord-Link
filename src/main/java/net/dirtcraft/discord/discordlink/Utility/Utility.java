@@ -134,10 +134,10 @@ public class Utility {
         DiscordUtil.setStatus(Activity.ActivityType.STREAMING, SpongeDiscordLib.getServerName(), "https://www.twitch.tv/dirtcraft/");
     }
 
-    public static boolean toConsole(Channel chat, String command, MessageSource sender, Action type) {
+    public static boolean toConsole(String command, MessageSource sender, Action type) {
         if (ignored.stream().anyMatch(command::startsWith)) return false;
         if (canUseCommand(sender, command)) {
-            final ConsoleSource commandSender = type.getCommandSource(chat, sender, command);
+            final ConsoleSource commandSender = type.getCommandSource(sender, command);
             toConsole(commandSender, command);
             return true;
         } else {

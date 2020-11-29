@@ -12,7 +12,6 @@ import org.spongepowered.api.scheduler.Task;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public class Unstuck implements DiscordCommandExecutor {
     @Override
