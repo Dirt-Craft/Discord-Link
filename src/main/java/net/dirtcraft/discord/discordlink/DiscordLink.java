@@ -1,9 +1,9 @@
 package net.dirtcraft.discord.discordlink;
 
 import com.google.inject.Inject;
-import net.dirtcraft.discord.discordlink.Commands.Sponge.Prefix;
 import net.dirtcraft.discord.discordlink.Commands.Sponge.UnVerify;
 import net.dirtcraft.discord.discordlink.Commands.Sponge.Verify;
+import net.dirtcraft.discord.discordlink.Commands.Sponge.prefix.*;
 import net.dirtcraft.discord.discordlink.Events.*;
 import net.dirtcraft.discord.discordlink.Storage.ConfigManager;
 import net.dirtcraft.discord.discordlink.Storage.Database;
@@ -113,18 +113,54 @@ public class DiscordLink extends ServerBootHandler {
                 .executor(new UnVerify(storage))
                 .build();
 
+        CommandSpec clear = CommandSpec.builder()
+                .permission(Permission.PREFIX_CLEAR)
+                .executor(new Clear())
+                .arguments(GenericArguments.onlyOne(GenericArguments.playerOrSource(Text.of("Target"))))
+                .build();
+
+        CommandSpec toggle = CommandSpec.builder()
+                .permission(Permission.PREFIX_TOGGLE)
+                .executor(new Toggle())
+                .arguments(GenericArguments.onlyOne(GenericArguments.playerOrSource(Text.of("Target"))))
+                .build();
+
+        CommandSpec group = CommandSpec.builder()
+                .permission(Permission.PREFIX_GROUP)
+                .executor(new Group())
+                .arguments(GenericArguments.onlyOne(GenericArguments.playerOrSource(Text.of("Target"))),
+                        GenericArguments.optional(GenericArguments.onlyOne(GenericArguments.string(Text.of("Group")))))
+                .build();
+
+        CommandSpec test = CommandSpec.builder()
+                .permission(Permission.PREFIX_TEST)
+                .executor(new Test())
+                .arguments(GenericArguments.flags()
+                        .valueFlag(GenericArguments.string(Text.of("ArrowColor")), "a")
+                        .valueFlag(GenericArguments.string(Text.of("BracketColor")), "c")
+                        .buildWith(GenericArguments.seq(
+                                GenericArguments.onlyOne(GenericArguments.playerOrSource(Text.of("Target"))),
+                                GenericArguments.remainingJoinedStrings(Text.of("Prefix")))))
+                .build();
+
+        CommandSpec set = CommandSpec.builder()
+                .permission(Permission.PREFIX_MODIFY)
+                .executor(new Set())
+                .arguments(GenericArguments.flags()
+                        .valueFlag(GenericArguments.string(Text.of("ArrowColor")), "a")
+                        .valueFlag(GenericArguments.string(Text.of("BracketColor")), "c")
+                        .buildWith(GenericArguments.seq(
+                                GenericArguments.onlyOne(GenericArguments.playerOrSource(Text.of("Target"))),
+                                GenericArguments.remainingJoinedStrings(Text.of("Prefix")))))
+                .build();
+
         CommandSpec prefix = CommandSpec.builder()
                 .permission(Permission.PREFIX_USE)
-                .description(Text.of("Sets a custom prefix. -a flag for arrow colour, -c flag for bracket colour. -i to ignore donor star."))
-                .executor(new Prefix())
-                .arguments(
-                        GenericArguments.flags()
-                                .flag("i")
-                                .valueFlag(GenericArguments.string(Text.of("ArrowColor")), "a")
-                                .valueFlag(GenericArguments.string(Text.of("BracketColor")), "c")
-                                .buildWith(GenericArguments.seq(
-                                        GenericArguments.user(Text.of("Target")),
-                                        GenericArguments.remainingJoinedStrings(Text.of("Prefix")))))
+                .child(clear, "clear", "none", "c")
+                .child(toggle, "toggle", "arrow", "star", "t")
+                .child(set, "set", "s")
+                .child(group, "group", "g")
+                .child(test, "debug", "test", "d")
                 .build();
 
         Sponge.getCommandManager().register(this, verify, "verify", "link");
