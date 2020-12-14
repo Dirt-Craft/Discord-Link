@@ -28,8 +28,8 @@ public class MuteBase extends DiscordCommandTree {
             .build();
 
     public MuteBase(){
-        initDatabase();
-        observeMutes();
+        //initDatabase();
+        //observeMutes();
         DiscordCommand remove = DiscordCommand.builder()
                 .setDescription("Removes a players mute")
                 .setCommandUsage("<@Discord>")
