@@ -115,8 +115,33 @@ public class Utility {
         } catch (Exception ignored){}
     }
 
+    public static void setRoleIfAbsent(long id, Roles role){
+        try {
+            Guild guild = Channels.getGuild();
+            Member discord = guild.retrieveMemberById(id).complete();
+            if (discord == null) return;
+            GuildMember member = new GuildMember(discord);
+            Role discordRole = role.getRole();
+            if (discordRole == null || member.hasRole(role)) return;
+            guild.addRoleToMember(member, discordRole).submit();
+        } catch (Exception ignored){}
+    }
+
+
     public static void removeRoleIfPresent(Guild guild, GuildMember member, Roles role){
         try {
+            Role discordRole = role.getRole();
+            if (discordRole == null || !member.hasRole(role)) return;
+            guild.removeRoleFromMember(member, discordRole).submit();
+        } catch (Exception ignored){}
+    }
+
+    public static void removeRoleIfPresent(long id, Roles role){
+        try {
+            Guild guild = Channels.getGuild();
+            Member discord = guild.retrieveMemberById(id).complete();
+            if (discord == null) return;
+            GuildMember member = new GuildMember(discord);
             Role discordRole = role.getRole();
             if (discordRole == null || !member.hasRole(role)) return;
             guild.removeRoleFromMember(member, discordRole).submit();

@@ -17,6 +17,7 @@ public enum Roles {
     NITRO   (nitroRoleID,    false,'a',"Nitro Booster"   ),
     DONOR   (donatorRoleID,  false,'6',"Donor"           ),
     VERIFIED(verifiedRoleID, false,'7',"Verified"        ),
+    MUTED   (mutedRoleID,    false,'0',"Muted"           ),
     NONE    (null,       false,'7',"None"            );
 
     private final long id;

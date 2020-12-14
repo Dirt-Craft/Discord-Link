@@ -17,6 +17,12 @@ public class DiscordCommandManager extends DiscordCommandTree {
     private final HashSet<String> defaultAliases = new HashSet<>(Arrays.asList("", "help"));
 
     public DiscordCommandManager() {
+        DiscordCommand mute = DiscordCommand.builder()
+            .setDescription("Command base for mute manipulation")
+            .setCommandExecutor(new MuteBase())
+            .setRequiredRoles(Roles.STAFF)
+            .build();
+
         DiscordCommand list = DiscordCommand.builder()
                 .setDescription("Shows a list of all players online.")
                 .setCommandExecutor(new PlayerList())
@@ -111,6 +117,7 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .setCommandExecutor(new Logs())
                 .build();
 
+        register(mute, "mute");
         register(list, "list", "players");
         register(stop, "stop");
         register(halt, "halt");

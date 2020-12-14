@@ -36,7 +36,8 @@ import org.spongepowered.api.text.Text;
         description = "Handles gamechats on the DirtCraft Discord.",
         authors = {
                 "juliann",
-                "ShinyAfro"
+                "ShinyAfro",
+                "Worive"
         },
         dependencies = {
                 @Dependency(id = "sponge-discord-lib", optional = true),

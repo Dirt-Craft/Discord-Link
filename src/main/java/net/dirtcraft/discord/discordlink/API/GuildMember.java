@@ -1,7 +1,7 @@
 package net.dirtcraft.discord.discordlink.API;
 
 import net.dirtcraft.discord.discordlink.DiscordLink;
-import net.dirtcraft.discord.discordlink.Storage.Database;
+import net.dirtcraft.discord.discordlink.Storage.tables.Verification;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
@@ -19,9 +19,14 @@ public class GuildMember extends WrappedMember {
     private List<Roles> roles;
     private Roles highestRank;
 
+    public static Optional<GuildMember> fromDiscordId(long id){
+        return Optional.ofNullable(Channels.getGuild().getMemberById(id))
+                .map(GuildMember::new);
+    }
+
     public static Optional<GuildMember> fromPlayerId(UUID player){
         final Optional<GuildMember> profile =  DiscordLink.getInstance().getStorage().getVerificationData(player)
-                .flatMap(Database.VerificationData::getDiscordId)
+                .flatMap(Verification.VerificationData::getDiscordId)
                 .flatMap(Utility::getMemberById)
                 .map(GuildMember::new);
         profile.ifPresent(member-> {
@@ -56,7 +61,7 @@ public class GuildMember extends WrappedMember {
     public Optional<PlatformUser> getPlayerData(){
         if (!retrievedPlayer) {
             final Optional<PlatformUser> optData = DiscordLink.getInstance().getStorage().getVerificationData(getId())
-                    .flatMap(Database.VerificationData::getUUID)
+                    .flatMap(Verification.VerificationData::getUUID)
                     .flatMap(PlatformUtils::getPlayerOffline);
             retrievedPlayer = true;
             return optData;
@@ -73,6 +78,10 @@ public class GuildMember extends WrappedMember {
 
     public boolean isStaff(){
         return roles.contains(Roles.STAFF);
+    }
+
+    public boolean isMuted(){
+        return roles.contains(Roles.MUTED);
     }
 
     public boolean isDonor(){
