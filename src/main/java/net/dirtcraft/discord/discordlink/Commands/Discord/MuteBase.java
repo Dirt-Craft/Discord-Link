@@ -18,8 +18,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MuteBase extends DiscordCommandTree {
-    boolean init = false;
-    Timer timer = new Timer();
     DiscordCommand add = DiscordCommand.builder()
             .setDescription("Mutes a player!")
             .setCommandUsage("<@Discord> [duration] [reason]")
@@ -28,8 +26,6 @@ public class MuteBase extends DiscordCommandTree {
             .build();
 
     public MuteBase(){
-        //initDatabase();
-        //observeMutes();
         DiscordCommand remove = DiscordCommand.builder()
                 .setDescription("Removes a players mute")
                 .setCommandUsage("<@Discord>")
@@ -64,36 +60,6 @@ public class MuteBase extends DiscordCommandTree {
             embed.setFooter("Requested By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl());
         });
         member.sendCommandResponse(embed.build(), 30);
-    }
-
-    private void observeMutes(){
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    if (!init || !PlatformUtils.isGameReady()) return;
-                    DiscordLink.getInstance().getStorage().deactivateExpiredMutes();
-                } catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }, 0, 1000*60*5);
-    }
-
-    private void initDatabase(){
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    if (init || !PlatformUtils.isGameReady()) return;
-                    DiscordLink.getInstance().getStorage().buildMuteTable();
-                    init = true;
-                } catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        };
-        timer.schedule(timerTask, 0, 1000);
     }
 
 }

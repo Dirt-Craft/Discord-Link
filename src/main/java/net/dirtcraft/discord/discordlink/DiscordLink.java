@@ -137,6 +137,7 @@ public class DiscordLink extends ServerBootHandler {
                 .permission(Permission.PREFIX_TEST)
                 .executor(new Test())
                 .arguments(GenericArguments.flags()
+                        .flag("s")
                         .valueFlag(GenericArguments.string(Text.of("ArrowColor")), "a")
                         .valueFlag(GenericArguments.string(Text.of("BracketColor")), "c")
                         .buildWith(GenericArguments.seq(
@@ -148,6 +149,7 @@ public class DiscordLink extends ServerBootHandler {
                 .permission(Permission.PREFIX_MODIFY)
                 .executor(new Set())
                 .arguments(GenericArguments.flags()
+                        .flag("s")
                         .valueFlag(GenericArguments.string(Text.of("ArrowColor")), "a")
                         .valueFlag(GenericArguments.string(Text.of("BracketColor")), "c")
                         .buildWith(GenericArguments.seq(

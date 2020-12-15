@@ -14,6 +14,7 @@ public class Permission {
     public static final String PREFIX_ARROW = "discordlink.prefix.arrow";
     public static final String PREFIX_BRACKETS = "discordlink.prefix.brackets";
     public static final String PREFIX_LONG = "discordlink.prefix.long";
+    public static final String PREFIX_INDICATOR = "discordlink.prefix.indicator";
 
     public static final String ROLES_MANAGER = "discordlink.roles.manager";
     public static final String ROLES_ADMIN = "discordlink.roles.admin";

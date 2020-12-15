@@ -42,19 +42,18 @@ public class Test implements CommandExecutor {
 
     private void setPrefix(@Nonnull CommandSource src, User target, @Nonnull CommandContext args) throws CommandException{
         final String title = args.<String>getOne("Prefix").orElseThrow(()->new CommandException(Text.of("§cYou must specify a prefix.")));
-        final Optional<String> caratColor = args.<String>getOne("ArrowColor");
-        final Optional<String> optBracketColor = args.<String>getOne("BracketColor");
+        final Optional<Boolean> staff = args.<Boolean>getOne("s").filter(x->target.hasPermission(Permission.PREFIX_INDICATOR));
+        final Optional<String> caratColor = args.<String>getOne("ArrowColor").filter(x->target.hasPermission(Permission.PREFIX_ARROW));
+        final Optional<String> optBracketColor = args.<String>getOne("BracketColor").filter(x->target.hasPermission(Permission.PREFIX_BRACKETS));
 
         if (title.length() > 20 && !src.hasPermission(Permission.PREFIX_LONG)) throw new CommandException(Text.of("§cThe prefix specified is too long."));
         if (isNotAllowed(title) && !src.hasPermission(Permission.ROLES_STAFF)) throw new CommandException(Text.of("§cThat prefix is not allowed."));
-        if (caratColor.isPresent() && !src.hasPermission(Permission.PREFIX_ARROW)) throw new CommandException(Text.of("§cYou do not have permission to change the arrow colour."));
-        if (caratColor.isPresent() && isNonColor(caratColor.get())) throw new CommandException(Text.of("§cInvalid arrow color."));
-        if (optBracketColor.isPresent() && !src.hasPermission(Permission.PREFIX_BRACKETS)) throw new CommandException(Text.of("§cYou do not have permission to change the bracket colour."));
         if (optBracketColor.isPresent() && isNonColor(optBracketColor.get())) throw new CommandException(Text.of("§cInvalid bracket color."));
+        if (caratColor.isPresent() && isNonColor(caratColor.get())) throw new CommandException(Text.of("§cInvalid arrow color."));
 
         String bracketColor = optBracketColor.orElse("&7");
         String chevron = getChevron(target, caratColor.orElse("&a&l"));
-        String rankPrefix = Settings.STAFF_PREFIXES.entrySet().stream()
+        String rankPrefix = staff.isPresent()? bracketColor: Settings.STAFF_PREFIXES.entrySet().stream()
                 .filter(p->target.hasPermission(p.getKey()))
                 .findFirst()
                 .map(s->String.format("%s[%s%s]", bracketColor, s.getValue(), bracketColor))
