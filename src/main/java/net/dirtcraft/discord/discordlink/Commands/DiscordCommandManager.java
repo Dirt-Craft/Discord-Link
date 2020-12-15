@@ -115,6 +115,7 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .setDescription("Shows latest logs")
                 .setRequiredRoles(Roles.DIRTY)
                 .setCommandExecutor(new Logs())
+                .setPreBootEnabled(true)
                 .build();
 
         register(mute, "mute");
