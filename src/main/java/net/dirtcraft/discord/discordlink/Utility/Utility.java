@@ -115,8 +115,33 @@ public class Utility {
         } catch (Exception ignored){}
     }
 
+    public static void setRoleIfAbsent(long id, Roles role){
+        try {
+            Guild guild = Channels.getGuild();
+            Member discord = guild.retrieveMemberById(id).complete();
+            if (discord == null) return;
+            GuildMember member = new GuildMember(discord);
+            Role discordRole = role.getRole();
+            if (discordRole == null || member.hasRole(role)) return;
+            guild.addRoleToMember(member, discordRole).submit();
+        } catch (Exception ignored){}
+    }
+
+
     public static void removeRoleIfPresent(Guild guild, GuildMember member, Roles role){
         try {
+            Role discordRole = role.getRole();
+            if (discordRole == null || !member.hasRole(role)) return;
+            guild.removeRoleFromMember(member, discordRole).submit();
+        } catch (Exception ignored){}
+    }
+
+    public static void removeRoleIfPresent(long id, Roles role){
+        try {
+            Guild guild = Channels.getGuild();
+            Member discord = guild.retrieveMemberById(id).complete();
+            if (discord == null) return;
+            GuildMember member = new GuildMember(discord);
             Role discordRole = role.getRole();
             if (discordRole == null || !member.hasRole(role)) return;
             guild.removeRoleFromMember(member, discordRole).submit();
@@ -135,7 +160,7 @@ public class Utility {
     }
 
     public static boolean toConsole(String command, MessageSource sender, Action type) {
-        if (ignored.stream().anyMatch(command::startsWith)) return false;
+        if (ignored.stream().anyMatch(e->command.matches("^\\b" + e + "\\b(.|\n)*?$"))) return false;
         if (canUseCommand(sender, command)) {
             final ConsoleSource commandSender = type.getCommandSource(sender, command);
             toConsole(commandSender, command);
@@ -154,7 +179,8 @@ public class Utility {
 
     private static boolean canUseCommand(GuildMember sender, String command){
         return sender.hasRole(Roles.DIRTY) ||
-               sender.hasRole(Roles.ADMIN) && blacklist.stream().noneMatch(command::startsWith);
+               sender.hasRole(Roles.ADMIN) &&
+               blacklist.stream().noneMatch(e->command.matches("^\\b" + e + "\\b(.|\n)*?$"));
     }
 
     public static void sendPermissionError(MessageSource event){

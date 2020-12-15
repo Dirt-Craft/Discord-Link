@@ -117,6 +117,9 @@ public class PluginConfiguration {
 
         @Setting(value = "Nitro-Role-ID")
         public static String nitroRoleID = "581195961813172225";
+
+        @Setting(value = "Muted-Role-ID")
+        public static String mutedRoleID = "589777192024670228";
     }
 
     @ConfigSerializable

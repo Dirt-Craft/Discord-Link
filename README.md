@@ -12,6 +12,10 @@ Todo:
  - promote enable/disable/whitelist (indv. servers)
  
 Changelog
+  - 1.5.1, 1.5.2
+    - added mute handling (ignores messages / deletes them)
+    - added mute commands !mute add, !mute remove, !mute info
+    - fixed kits and ranks only accepting uuid.
   - 1.5.0
     - Moved chat handlers to use scheduler
     - Allowed bot commands in DMs

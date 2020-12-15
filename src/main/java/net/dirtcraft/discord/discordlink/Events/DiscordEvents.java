@@ -7,6 +7,7 @@ import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
+import net.dirtcraft.discord.discordlink.Storage.tables.Verification;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformChat;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
@@ -45,9 +46,14 @@ public class DiscordEvents extends ListenerAdapter {
     }
 
     public void processGuildMessage(MessageSource sender, MessageReceivedEvent event) {
+        if (sender.isMuted() && !sender.isStaff()) {
+            if (event.getChannelType() != ChannelType.PRIVATE) event.getMessage().delete().queue(s->{},e->{});
+            sender.sendMessage("<@" + sender.getId() + "> You are **not** allowed to talk there! Please open an appeal in <#590388043379376158> to lift your sanction.");
+            return;
+        }
+
         final String rawMessage = event.getMessage().getContentRaw();
         final Action intent = Action.fromMessageRaw(rawMessage);
-
         if (intent.isBotCommand()) commandManager.process(sender, intent.getCommand(event));
         else if (PlatformUtils.isGameReady() && intent.isChat()) PlatformChat.discordToMCAsync(sender, event);
         else if (PlatformUtils.isGameReady() && intent.isConsole()) {
@@ -68,7 +74,7 @@ public class DiscordEvents extends ListenerAdapter {
     public void processUnverifiedMessage(MessageSource sender, MessageReceivedEvent event){
         if (event.getChannelType() != ChannelType.PRIVATE) event.getMessage().delete().queue();
         Database database = DiscordLink.getInstance().getStorage();
-        Database.VerificationData data = database.getVerificationData(sender.getId()).orElse(null);
+        Verification.VerificationData data = database.getVerificationData(sender.getId()).orElse(null);
         if (data != null && data.getUUID().isPresent()) {
             Utility.setRoleIfAbsent(Channels.getGuild(), sender, Roles.VERIFIED);
             sender.sendCommandResponse("Verified role was missing, But you appear to be verified so it has been added again. Please send message or command again.");

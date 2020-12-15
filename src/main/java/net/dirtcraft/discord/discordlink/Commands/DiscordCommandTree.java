@@ -3,13 +3,11 @@ package net.dirtcraft.discord.discordlink.Commands;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DiscordCommandTree implements DiscordCommandExecutor {
-
     protected final HashMap<String, DiscordCommand> commandMap = new HashMap<>();
+    protected final HashSet<String> defaults = new HashSet<>(Arrays.asList("help", "?"));
 
     public void register(DiscordCommand command, String... alias){
         for (String name : alias) {
@@ -19,16 +17,17 @@ public class DiscordCommandTree implements DiscordCommandExecutor {
 
     @Override
     public void execute(MessageSource member, String command, List<String> args) throws DiscordCommandException {
-        if (args.size() == 0) {
+        if (args.size() == 0 || defaults.contains(args.get(0))) {
             defaultResponse(member, command, args);
             return;
         }
 
-        String base = args.remove(0);
-        DiscordCommand discordCommand = commandMap.get(base.toLowerCase());
-
-        if (discordCommand != null) discordCommand.process(member, base, args);
-        else throw new DiscordCommandException("Command not found");
+        final String base = args.get(0);
+        final DiscordCommand discordCommand = commandMap.get(base.toLowerCase());
+        if (discordCommand != null) {
+            args.remove(0);
+            discordCommand.process(member, base, args);
+        } else defaultResponse(member, command, args);
     }
 
     public Map<String, DiscordCommand> getCommandMap(){

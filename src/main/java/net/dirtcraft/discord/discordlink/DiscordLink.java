@@ -36,12 +36,13 @@ import org.spongepowered.api.text.Text;
         description = "Handles gamechats on the DirtCraft Discord.",
         authors = {
                 "juliann",
-                "ShinyAfro"
+                "ShinyAfro",
+                "Worive"
         },
         dependencies = {
+                @Dependency(id = "sponge-discord-lib", optional = true),
                 @Dependency(id = "ultimatechat", optional = true),
-                @Dependency(id = "sponge-discord-lib"),
-                @Dependency(id = "dirt-database-lib")
+                @Dependency(id = "dirt-database-lib", optional = true)
         }
 )
 public class DiscordLink extends ServerBootHandler {
@@ -91,6 +92,7 @@ public class DiscordLink extends ServerBootHandler {
     @Listener(order = Order.PRE)
     public void onGameInitialization(GameInitializationEvent event) {
         super.onGameInitialization(event);
+        if (instance == null) return;
         Sponge.getEventManager().registerListeners(instance, new SpongeEvents(instance, storage));
         this.registerCommands();
         Utility.setStatus();
@@ -138,6 +140,7 @@ public class DiscordLink extends ServerBootHandler {
                 .permission(Permission.PREFIX_TEST)
                 .executor(new Test())
                 .arguments(GenericArguments.flags()
+                        .flag("s")
                         .valueFlag(GenericArguments.string(Text.of("ArrowColor")), "a")
                         .valueFlag(GenericArguments.string(Text.of("BracketColor")), "c")
                         .buildWith(GenericArguments.seq(
@@ -149,6 +152,7 @@ public class DiscordLink extends ServerBootHandler {
                 .permission(Permission.PREFIX_MODIFY)
                 .executor(new Set())
                 .arguments(GenericArguments.flags()
+                        .flag("s")
                         .valueFlag(GenericArguments.string(Text.of("ArrowColor")), "a")
                         .valueFlag(GenericArguments.string(Text.of("BracketColor")), "c")
                         .buildWith(GenericArguments.seq(

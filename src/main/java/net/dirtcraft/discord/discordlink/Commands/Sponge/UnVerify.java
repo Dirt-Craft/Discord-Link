@@ -4,6 +4,7 @@ import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
+import net.dirtcraft.discord.discordlink.Storage.tables.Verification;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Guild;
 import org.spongepowered.api.command.CommandException;
@@ -34,7 +35,7 @@ public class UnVerify implements CommandExecutor {
     }
 
     private void execute(Player player){
-        Database.VerificationData data = storage.getVerificationData(player.getUniqueId()).orElse(null);
+        Verification.VerificationData data = storage.getVerificationData(player.getUniqueId()).orElse(null);
         if (data == null){
             player.sendMessage(Utility.format("&cYour account is not verified!"));
         } else {

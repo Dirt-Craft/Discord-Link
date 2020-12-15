@@ -9,6 +9,7 @@ import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Storage.tables.Verification;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Guild;
@@ -54,7 +55,7 @@ public class Unlink implements DiscordCommandExecutor {
         } else {
             response = storage.getLastKnownUsername(matcher.group(1));
             if (response == null) response = storage.getVerificationData(matcher.group(1))
-                    .flatMap(Database.VerificationData::getUUID)
+                    .flatMap(Verification.VerificationData::getUUID)
                     .map(UUID::toString)
                     .orElseThrow(()->new DiscordCommandException("The user was not verified!"));
         }
