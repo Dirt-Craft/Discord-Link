@@ -42,9 +42,9 @@ public class Test implements CommandExecutor {
 
     private void setPrefix(@Nonnull CommandSource src, User target, @Nonnull CommandContext args) throws CommandException{
         final String title = args.<String>getOne("Prefix").orElseThrow(()->new CommandException(Text.of("§cYou must specify a prefix.")));
-        final Optional<Boolean> staff = args.<Boolean>getOne("s").filter(x->target.hasPermission(Permission.PREFIX_INDICATOR));
-        final Optional<String> caratColor = args.<String>getOne("ArrowColor").filter(x->target.hasPermission(Permission.PREFIX_ARROW));
-        final Optional<String> optBracketColor = args.<String>getOne("BracketColor").filter(x->target.hasPermission(Permission.PREFIX_BRACKETS));
+        final Optional<Boolean> staff = args.<Boolean>getOne("s").filter(x->src.hasPermission(Permission.PREFIX_INDICATOR));
+        final Optional<String> caratColor = args.<String>getOne("ArrowColor").filter(x->src.hasPermission(Permission.PREFIX_ARROW));
+        final Optional<String> optBracketColor = args.<String>getOne("BracketColor").filter(x->src.hasPermission(Permission.PREFIX_BRACKETS));
 
         if (title.length() > 20 && !src.hasPermission(Permission.PREFIX_LONG)) throw new CommandException(Text.of("§cThe prefix specified is too long."));
         if (isNotAllowed(title) && !src.hasPermission(Permission.ROLES_STAFF)) throw new CommandException(Text.of("§cThat prefix is not allowed."));

@@ -3,6 +3,7 @@ package net.dirtcraft.discord.discordlink.Commands;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.Discord.*;
+import net.dirtcraft.discord.discordlink.Commands.Discord.Item.ItemList;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
@@ -111,6 +112,12 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .setCommandExecutor(new Version())
                 .build();
 
+        DiscordCommand inv = DiscordCommand.builder()
+                .setDescription("Debug")
+                .setRequiredRoles(Roles.MOD)
+                .setCommandExecutor(new ItemBase())
+                .build();
+
         DiscordCommand logs = DiscordCommand.builder()
                 .setDescription("Shows latest logs")
                 .setRequiredRoles(Roles.DIRTY)
@@ -134,6 +141,7 @@ public class DiscordCommandManager extends DiscordCommandTree {
         register(kits, "kits");
         register(version, "version", "info");
         register(logs, "logs");
+        register(inv, "inv");
     }
 
     public void process(MessageSource member, String args){

@@ -29,7 +29,7 @@ public class PlatformUser {
         return user.isOnline();
     }
 
-    Optional<Player> getPlayer(){
+    public Optional<Player> getPlayer(){
         return user.getPlayer();
     }
 }

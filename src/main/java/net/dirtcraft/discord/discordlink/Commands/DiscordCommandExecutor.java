@@ -34,17 +34,19 @@ public interface DiscordCommandExecutor {
         String s = args.get(0);
         if (s.matches("<?@?!?(\\d+)>?")){
             long discordId = Long.parseLong(s.replaceAll("<?@?!?(\\d+)>?", "$1"));
-            Optional<GuildMember> member =  Optional.ofNullable(Channels.getGuild())
+            Optional<GuildMember> member = Optional.ofNullable(Channels.getGuild())
                     .map(g->g.retrieveMemberById(discordId))
                     .map(RestAction::complete)
                     .map(GuildMember::new);
             member.ifPresent(x->args.remove(0));
             return member;
         } else {
-            return PlatformUtils.getPlayerOffline(s)
+            Optional<GuildMember> member =  PlatformUtils.getPlayerOffline(s)
                     .map(PlatformUser::getUUID)
                     .flatMap(uuid-> DiscordLink.getInstance().getStorage().getVerificationData(uuid))
                     .flatMap(Verification.VerificationData::getGuildMember);
+            member.ifPresent(x->args.remove(0));
+            return member;
         }
     }
 
@@ -71,7 +73,9 @@ public interface DiscordCommandExecutor {
             member.ifPresent(x->args.remove(0));
             return member;
         } else {
-            return PlatformUtils.getPlayerOffline(s);
+            Optional<PlatformUser> member =  PlatformUtils.getPlayerOffline(s);
+            member.ifPresent(x->args.remove(0));
+            return member;
         }
     }
 }
