@@ -78,8 +78,6 @@ public class DiscordLink extends ServerBootHandler {
         this.storage = new Database();
         instance = this;
 
-        channel = Sponge.getGame().getChannelRegistrar().createRawChannel(this, Settings.ROOT_CHANNEL);
-        channel.addListener(new PluginMessageHandler());
         getJDA().addEventListener(new DiscordEvents());
         super.onGameConstruction(event);
         logger.info("Discord Link initialized");
@@ -95,6 +93,8 @@ public class DiscordLink extends ServerBootHandler {
         Utility.setStatus();
         Utility.setTopic();
 
+        channel = Sponge.getGame().getChannelRegistrar().createRawChannel(this, Settings.ROOT_CHANNEL);
+        channel.addListener(new PluginMessageHandler());
         if (SpongeDiscordLib.getServerName().toLowerCase().contains("pixel")) {
             Sponge.getEventManager().registerListeners(instance, new NormalChat());
         } else {

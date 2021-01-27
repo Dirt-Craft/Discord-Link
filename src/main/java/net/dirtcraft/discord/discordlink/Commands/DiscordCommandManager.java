@@ -120,7 +120,7 @@ public class DiscordCommandManager extends DiscordCommandTree {
 
         DiscordCommand logs = DiscordCommand.builder()
                 .setDescription("Shows latest logs")
-                .setRequiredRoles(Roles.DIRTY)
+                .setRequiredRoles(Roles.ADMIN)
                 .setCommandExecutor(new Logs())
                 .setPreBootEnabled(true)
                 .build();
