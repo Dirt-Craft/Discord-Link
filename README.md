@@ -12,6 +12,13 @@ Todo:
  - promote enable/disable/whitelist (indv. servers)
  
 Changelog
+  - 2.0.0
+    - TODO: command schema for editing config values? (Bungee-Style). JDA Status, etc.
+    - new API for other plugins, Rather then directly accessing the implementation plugins such as dirt-listener etc. can now use an API.
+    - Big ass refactor for the entire API to function correctly. Lot less static methods, More managers. Roles are no longer hard coded.
+    - Overhaul of how the plugin loads. Now it will load using a callback. JDA will try to connect every 2.5 minutes until a connection is gained. 
+     This means when the server loses connection during boot up discord link should be able to initialize. Previously if JDA took longer then 5
+     minutes the entire plugin would crash.
   - 1.5.1, 1.5.2
     - added mute handling (ignores messages / deletes them)
     - added mute commands !mute add, !mute remove, !mute info

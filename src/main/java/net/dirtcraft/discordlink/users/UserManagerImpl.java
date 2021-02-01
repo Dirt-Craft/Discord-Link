@@ -92,7 +92,8 @@ public class UserManagerImpl implements UserManager {
         boolean isPrivate = event.getMessage().isFromType(ChannelType.PRIVATE);
         long channelId = event.getChannel().getIdLong();
         DiscordChannelImpl channel = channelManager.getChannel(channelId, isPrivate);
-        return new MessageSourceImpl(storage, event.getMember(), channel, roleManager, event);
+        Member member = channelManager.getGuild().retrieveMember(event.getAuthor()).complete();
+        return new MessageSourceImpl(storage, member, channel, roleManager, event);
     }
 
     public GuildMember getMember(Member member){
