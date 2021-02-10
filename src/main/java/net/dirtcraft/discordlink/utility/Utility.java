@@ -155,7 +155,7 @@ public class Utility {
 
     private static boolean canUseCommand(GuildMember sender, String command){
         return sender.hasRole(DiscordRoles.DIRTY) ||
-               sender.hasRole(DiscordRoles.ADMIN) &&
+               sender.hasRole(DiscordRoles.ADMIN) && sender.hasInGamePermission(Permission.CONSOLE) &&
                PluginConfiguration.Command.blacklist.stream().noneMatch(e->command.matches("^\\b" + e + "\\b(.|\n)*?$"));
     }
 

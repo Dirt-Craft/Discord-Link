@@ -32,6 +32,13 @@ public class PlatformProvider {
                 .map(PlatformUserImpl::new);
     }
 
+    public static Optional<PlatformUser> getPlayerOffline(String identifier, boolean acceptUUID){
+        if (acceptUUID) return getPlayerOffline(identifier);
+        return Sponge.getServiceManager().provide(UserStorageService.class)
+                .flatMap(uss->uss.get(identifier))
+                .map(PlatformUserImpl::new);
+    }
+
     public static Optional<PlatformPlayer> getPlayer(PlatformUser player){
         return player.<User>getOfflinePlayer()
                 .getPlayer()

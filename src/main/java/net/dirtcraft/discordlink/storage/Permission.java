@@ -1,6 +1,7 @@
 package net.dirtcraft.discordlink.storage;
 
 public class Permission {
+    public static final String CONSOLE = "discordlink.console";
     public static final String PROMOTE_PERMISSION_GROUP_PREFIX = "discordlink.promote.";
     public static final String PROMOTE_PERMISSION = "discordlink.promote.use";
 

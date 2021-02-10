@@ -1,6 +1,7 @@
 package net.dirtcraft.discordlink.users.permission.dummy;
 
 import net.dirtcraft.discordlink.users.permission.PermissionProvider;
+import net.dirtcraft.discordlink.users.permission.subject.PermissionResolver;
 import net.dirtcraft.spongediscordlib.users.MessageSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -49,6 +50,11 @@ public class DefaultProvider extends PermissionProvider {
 
     public Optional<RankUpdate> modifyRank(@Nullable Player source, @Nullable UUID targetUUID, @Nullable String trackName, boolean promote) {
         if (source != null) source.sendMessage(Text.of("This version of luckperms is not supported!"));
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<PermissionResolver> getPermission(UUID uuid) {
         return Optional.empty();
     }
 }

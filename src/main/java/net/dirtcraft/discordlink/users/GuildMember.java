@@ -1,5 +1,7 @@
 package net.dirtcraft.discordlink.users;
 
+import net.dirtcraft.discordlink.users.permission.PermissionProvider;
+import net.dirtcraft.discordlink.users.permission.subject.PermissionResolver;
 import net.dirtcraft.spongediscordlib.users.DiscordMember;
 import net.dirtcraft.spongediscordlib.users.platform.PlatformPlayer;
 import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
@@ -17,12 +19,15 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.spongepowered.api.Sponge;
 
 import java.util.*;
 
 public class GuildMember extends WrappedMember implements DiscordMember {
     PlatformUser user;
+    PermissionResolver permissions;
     boolean retrievedPlayer;
+    boolean retrievedPermissions;
     private final RoleManager roleManager;
     private final Database storage;
     private Set<DiscordRole> roles;
@@ -46,6 +51,18 @@ public class GuildMember extends WrappedMember implements DiscordMember {
                 .forEach(roles::add);
     }
 
+    public boolean hasInGamePermission(String permission){
+        if (hasRole(DiscordRoles.DIRTY)) return true;
+        if (!retrievedPlayer) getPlayerData();
+        if (user == null) return false;
+        if (!retrievedPermissions) permissions = PermissionProvider.INSTANCE
+                .getPermission(user.getUUID())
+                .orElse(null);
+        if (permissions == null) return false;
+        boolean perm =  permissions.hasPermission(permission);
+        return perm;
+    }
+
     @Override
     public Optional<PlatformPlayer> getPlayer(){
         if (!retrievedPlayer) return getPlayerData().flatMap(PlatformProvider::getPlayer);
@@ -58,6 +75,7 @@ public class GuildMember extends WrappedMember implements DiscordMember {
             final Optional<PlatformUser> optData = storage.getVerificationData(getId())
                     .flatMap(Verification.VerificationData::getUUID)
                     .flatMap(PlatformProvider::getPlayerOffline);
+            optData.ifPresent(u->this.user = u);
             retrievedPlayer = true;
             return optData;
         } else return Optional.ofNullable(user);
@@ -160,6 +178,10 @@ public class GuildMember extends WrappedMember implements DiscordMember {
         roleManager.getRoles().stream()
                 .filter(e->(e.isStaff() && highestRank.getStaffLevel() <= e.getStaffLevel()) || (discordRoles.contains(e.getRole())))
                 .forEach(roles::add);
+    }
+
+    Member getWrappedMember(){
+        return member;
     }
 
 }

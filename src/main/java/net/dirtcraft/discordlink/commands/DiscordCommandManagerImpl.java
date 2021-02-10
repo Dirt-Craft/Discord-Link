@@ -87,7 +87,7 @@ public class DiscordCommandManagerImpl extends DiscordCommandTree {
         DiscordCommandImpl sync = DiscordCommandImpl.builder()
                 .setDescription("Runs LP Sync to re-sync the perms")
                 .setCommandExecutor(new IngameCommand("lp sync"))
-                .setRequiredRoles(DiscordRoles.ADMIN)
+                .setRequiredRoles(DiscordRoles.STAFF)
                 .build();
 
         DiscordCommandImpl unverify = DiscordCommandImpl.builder()
@@ -110,7 +110,7 @@ public class DiscordCommandManagerImpl extends DiscordCommandTree {
 
         DiscordCommandImpl version = DiscordCommandImpl.builder()
                 .setDescription("Shows the current version")
-                .setRequiredRoles(DiscordRoles.DIRTY)
+                .setRequiredRoles(DiscordRoles.MOD)
                 .setCommandExecutor(new Version())
                 .build();
 
@@ -122,7 +122,7 @@ public class DiscordCommandManagerImpl extends DiscordCommandTree {
 
         DiscordCommandImpl logs = DiscordCommandImpl.builder()
                 .setDescription("Shows latest logs")
-                .setRequiredRoles(DiscordRoles.ADMIN)
+                .setRequiredRoles(DiscordRoles.MOD)
                 .setCommandExecutor(new Logs())
                 .setPreBootEnabled(true)
                 .build();

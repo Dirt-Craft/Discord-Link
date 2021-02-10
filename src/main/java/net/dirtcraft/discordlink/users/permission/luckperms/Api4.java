@@ -5,10 +5,13 @@ import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.Node;
 import me.lucko.luckperms.api.Track;
 import me.lucko.luckperms.api.caching.MetaData;
+import me.lucko.luckperms.api.caching.PermissionData;
 import me.lucko.luckperms.api.context.ContextSet;
 import net.dirtcraft.discordlink.users.MessageSourceImpl;
 import net.dirtcraft.discordlink.storage.Permission;
+import net.dirtcraft.discordlink.users.permission.subject.PermissionResolver;
 import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.luckperms.api.cacheddata.CachedPermissionData;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -154,5 +157,13 @@ public class Api4 extends LuckPermissions {
         return Optional.ofNullable(api.getUserManager().getUser(uuid))
                 .map(u->u.getCachedData().getMetaData(Contexts.of(contexts, Contexts.global().getSettings())))
                 .map(MetaData::getPrefix);
+    }
+
+    public Optional<PermissionResolver> getPermission(UUID uuid){
+        me.lucko.luckperms.api.User user = api.getUserManager().loadUser(uuid).join();
+        if (user == null) return Optional.empty();
+
+        PermissionData data = user.getCachedData().getPermissionData(Contexts.of(contexts, Contexts.global().getSettings()));
+        return Optional.of(permission -> data.getPermissionValue(permission).asBoolean());
     }
 }

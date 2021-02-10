@@ -1,12 +1,13 @@
 package net.dirtcraft.discordlink.users.permission.luckperms;
 
-
-import net.dirtcraft.discordlink.users.MessageSourceImpl;
+import me.lucko.luckperms.api.caching.PermissionData;
 import net.dirtcraft.discordlink.storage.Permission;
 import net.dirtcraft.discordlink.users.permission.PermissionProvider;
+import net.dirtcraft.discordlink.users.permission.subject.PermissionResolver;
 import net.dirtcraft.spongediscordlib.users.MessageSource;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.cacheddata.CachedPermissionData;
 import net.luckperms.api.context.ImmutableContextSet;
 import net.luckperms.api.model.data.NodeMap;
 import net.luckperms.api.model.user.UserManager;
@@ -14,6 +15,7 @@ import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeEqualityPredicate;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.track.Track;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 
@@ -155,5 +157,13 @@ public class Api5 extends LuckPermissions {
     public Optional<String> getPrefix(UUID uuid){
         return Optional.ofNullable(api.getUserManager().getUser(uuid))
                 .map(u-> u.getCachedData().getMetaData().getPrefix());
+    }
+
+    public Optional<PermissionResolver> getPermission(UUID uuid){
+        net.luckperms.api.model.user.User user = api.getUserManager().loadUser(uuid).join();
+        if (user == null) return Optional.empty();
+
+        CachedPermissionData data = user.getCachedData().getPermissionData();
+        return Optional.of(permission -> data.checkPermission(permission).asBoolean());
     }
 }
