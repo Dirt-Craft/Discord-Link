@@ -11,26 +11,38 @@ import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.scheduler.Task;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class IngameCommand implements DiscordCommandExecutor {
     private final String command;
     private final boolean args;
     private final DiscordRole argsReq;
+    private int required;
 
     public IngameCommand(String command){
         this.command = command;
         this.args = false;
         this.argsReq = DiscordRoles.NONE;
+        required = 0;
+        Pattern pattern = Pattern.compile("\\{arg}");
+        Matcher matcher = pattern.matcher(command);
+        while (matcher.find()) required++;
     }
 
     public IngameCommand(String command, DiscordRole role){
         this.command = command;
         this.args = true;
         this.argsReq = role;
+        required = 0;
+        Pattern pattern = Pattern.compile("\\{arg}");
+        Matcher matcher = pattern.matcher(command);
+        while (matcher.find()) required++;
     }
 
     @Override
     public void execute(MessageSource source, String command, List<String> args) throws DiscordCommandException {
+        if (required > args.size()) throw new DiscordCommandException("Expected " + required + " arguments, but got " + args.size());
         String runCommand = parseCommand(source, this.command, args);
         ConsoleSource sender = source.getCommandSource(runCommand);
         Task.builder()
@@ -53,8 +65,7 @@ public class IngameCommand implements DiscordCommandExecutor {
         //        .filter(s->s.matches("--player=\\S+"))
         //        .peek(arguments::remove)
         //        .collect(Collectors.toList());
-        final String marker = "\\{arg}";
-        while (template.matches("(?i)^.*" + marker + ".*$") && !arguments.isEmpty()) template = template.replaceFirst("(?i)" + marker, arguments.get(0));
+        while (template.contains("{arg}") && !arguments.isEmpty()) template = template.replaceFirst("\\{arg}", arguments.remove(0));
         return template + " " + String.join(" ", arguments);
     }
 }

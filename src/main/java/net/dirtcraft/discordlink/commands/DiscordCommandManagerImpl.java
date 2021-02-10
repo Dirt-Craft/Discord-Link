@@ -45,6 +45,14 @@ public class DiscordCommandManagerImpl extends DiscordCommandTree {
                 .setRequiredRoles(DiscordRoles.ADMIN)
                 .build();
 
+        DiscordCommandImpl reboot = DiscordCommandImpl.builder()
+                .setDescription("Reboot the server in X minutes.")
+                .setCommandUsage("<Minutes>")
+                .setCommandExecutor(new IngameCommand("restart start {arg} -m", DiscordRoles.NONE))
+                .setPreBootEnabled(false)
+                .setRequiredRoles(DiscordRoles.STAFF)
+                .build();
+
         DiscordCommandImpl unstuck = DiscordCommandImpl.builder()
                 .setDescription("Teleports you to spawn if you are verified.")
                 .setCommandExecutor(new Unstuck())
@@ -131,6 +139,7 @@ public class DiscordCommandManagerImpl extends DiscordCommandTree {
         register(list, "list", "players");
         register(stop, "stop");
         register(halt, "halt");
+        register(reboot, "reboot", "restart");
         register(seen, "seen");
         register(unstuck, "unstuck", "spawn");
         register(username, "username");
