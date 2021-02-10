@@ -25,9 +25,6 @@ public class IngameCommand implements DiscordCommandExecutor {
         this.args = false;
         this.argsReq = DiscordRoles.NONE;
         required = 0;
-        Pattern pattern = Pattern.compile("\\{arg}");
-        Matcher matcher = pattern.matcher(command);
-        while (matcher.find()) required++;
     }
 
     public IngameCommand(String command, DiscordRole role){
@@ -66,6 +63,6 @@ public class IngameCommand implements DiscordCommandExecutor {
         //        .peek(arguments::remove)
         //        .collect(Collectors.toList());
         while (template.contains("{arg}") && !arguments.isEmpty()) template = template.replaceFirst("\\{arg}", arguments.remove(0));
-        return template + " " + String.join(" ", arguments);
+        return arguments.isEmpty()? template: template + " " + String.join(" ", arguments);
     }
 }
